@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const initializeDatabase = require('./init-db');
 
 const app = express();
 app.use(express.json());
@@ -28,6 +29,13 @@ app.get('/api/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+// Initialize database and start server
+initializeDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('Failed to initialize database:', err);
+  process.exit(1);
 });
