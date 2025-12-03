@@ -1,8 +1,21 @@
 import axios from 'axios';
 
 // Configure axios base URL
+// If VITE_API_URL is set, use it; otherwise detect from current host
+let baseURL = process.env.VITE_API_URL;
+
+if (!baseURL) {
+  // Default to localhost for development
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseURL = 'http://localhost:9500';
+  } else {
+    // For custom domains, use the same hostname with API port
+    baseURL = `${window.location.protocol}//${window.location.hostname}:9500`;
+  }
+}
+
 const apiClient = axios.create({
-  baseURL: process.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL,
   timeout: 10000,
 });
 
