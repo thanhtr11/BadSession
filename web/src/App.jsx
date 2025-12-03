@@ -48,7 +48,20 @@ function App() {
   };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#f5f7fa',
+        fontSize: '24px',
+        fontFamily: 'Arial, sans-serif',
+        color: '#2c3e50'
+      }}>
+        Loading...
+      </div>
+    );
   }
 
   return (

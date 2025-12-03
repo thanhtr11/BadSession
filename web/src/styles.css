@@ -21,6 +21,13 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f5f7fa;
   color: var(--charcoal);
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
 }
 
 .app-container {
@@ -146,6 +153,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  background-color: #f5f7fa;
 }
 
 .form-card {
@@ -154,6 +163,8 @@ body {
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: block;
+  visibility: visible;
 }
 
 .form-title {
