@@ -32,10 +32,10 @@ services:
       DB_USER: badsession
       DB_PASSWORD: badsession_password
       DB_NAME: badsession
-      PORT: 8000
+      PORT: 9500
       JWT_SECRET: your-secret-key-change-in-production
     ports:
-      - "8000:8000"
+      - "9500:9500"
     volumes:
       - ./server:/app
       - /app/node_modules
@@ -49,7 +49,7 @@ services:
     depends_on:
       - server
     environment:
-      VITE_API_URL: http://localhost:8000
+      VITE_API_URL: http://localhost:9500
     ports:
       - "3000:3000"
     volumes:
