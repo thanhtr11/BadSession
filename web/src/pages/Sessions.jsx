@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import apiClient from '../api';
 
 export default function Sessions() {
   const [sessions, setSessions] = useState([]);
@@ -29,10 +30,7 @@ export default function Sessions() {
 
   const fetchSessions = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('/api/sessions', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await apiClient.get('/sessions');
       setSessions(res.data);
     } catch (error) {
       console.error('Failed to fetch sessions:', error);
@@ -44,29 +42,24 @@ export default function Sessions() {
   const handleCreateSession = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('/api/sessions', formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.post('/sessions', formData);
       setShowModal(false);
       setFormData({ session_date: '', session_time: '', location: '' });
       fetchSessions();
     } catch (error) {
       console.error('Failed to create session:', error);
+      alert('Failed to create session: ' + error.response?.data?.error);
     }
   };
 
   const handleCheckIn = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
       const payload = {
         session_id: selectedSession.id,
         ...(checkInData.type === 'self' ? { is_self_checkin: true } : { guest_name: checkInData.guest_name })
       };
-      await axios.post('/api/attendance/check-in', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.post('/attendance/check-in', payload);
       setCheckInData({ type: 'self', guest_name: '' });
       fetchSessionDetails(selectedSession.id);
       alert('Check-in successful!');
@@ -78,13 +71,11 @@ export default function Sessions() {
 
   const fetchSessionDetails = async (sessionId) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`/api/sessions/${sessionId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await apiClient.get(`/sessions/${sessionId}`);
       setSessionDetails(res.data);
     } catch (error) {
       console.error('Failed to fetch session details:', error);
+      alert('Failed to fetch session details: ' + error.response?.data?.error);
     }
   };
 
@@ -98,12 +89,9 @@ export default function Sessions() {
     if (!editingAttendance) return;
 
     try {
-      const token = localStorage.getItem('token');
       const payload = editingAttendance.is_guest ? { guest_name: editGuestName } : {};
 
-      await axios.put(`/api/attendance/${editingAttendance.id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.put(`/attendance/${editingAttendance.id}`, payload);
 
       setEditModal(false);
       setEditingAttendance(null);
@@ -122,10 +110,7 @@ export default function Sessions() {
     if (!window.confirm(`Delete check-in for ${attendance.name}?`)) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`/api/attendance/${attendance.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.delete(`/attendance/${attendance.id}`);
 
       // Refresh session details
       fetchSessionDetails(sessionDetails.id);
