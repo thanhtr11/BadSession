@@ -22,8 +22,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 
 -- Attendance records for players
-DROP TABLE IF EXISTS attendance;
-CREATE TABLE attendance (
+CREATE TABLE IF NOT EXISTS attendance (
   id INT AUTO_INCREMENT PRIMARY KEY,
   session_id INT NOT NULL,
   user_id INT,
