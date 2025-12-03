@@ -48,8 +48,6 @@ services:
     container_name: badsession-web
     depends_on:
       - server
-    environment:
-      VITE_API_URL: http://localhost:9500/api
     ports:
       - "3000:3000"
     volumes:
