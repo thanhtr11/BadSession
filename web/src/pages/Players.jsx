@@ -18,8 +18,7 @@ export default function Players() {
 
   const fetchPlayers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await apiClient.get('/users', {
+      const res = await apiClient.get('/users');
       setPlayers(res.data.filter(u => u.role === 'Player'));
     } catch (error) {
       console.error('Failed to fetch players:', error);
@@ -31,10 +30,9 @@ export default function Players() {
   const handleViewPlayer = async (player) => {
     setSelectedPlayer(player);
     try {
-      const token = localStorage.getItem('token');
       const [attendanceRes, donationsRes] = await Promise.all([
-        apiClient.get(`/api/attendance/player/${player.id}/history`, {
-        apiClient.get('/finance/donations', {
+        apiClient.get(`/attendance/player/${player.id}/history`),
+        apiClient.get('/finance/donations')
       ]);
 
       const playerDonations = donationsRes.data.filter(d => d.contributor_id === player.id && !d.is_guest);

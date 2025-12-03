@@ -30,11 +30,10 @@ export default function Finance({ user }) {
 
   const fetchFinanceData = async () => {
     try {
-      const token = localStorage.getItem('token');
       const [donationsRes, expensesRes, summaryRes] = await Promise.all([
-        apiClient.get('/finance/donations', {
-        apiClient.get('/finance/expenses', {
-        apiClient.get('/finance/summary', {
+        apiClient.get('/finance/donations'),
+        apiClient.get('/finance/expenses'),
+        apiClient.get('/finance/summary')
       ]);
       setDonations(donationsRes.data);
       setExpenses(expensesRes.data);
@@ -54,9 +53,8 @@ export default function Finance({ user }) {
       return;
     }
     try {
-      const token = localStorage.getItem('token');
       const type = donationForm.is_guest ? 'guest' : 'player';
-      const res = await apiClient.get(`/api/finance/search?type=${type}&query=${encodeURIComponent(query)}`, {
+      const res = await apiClient.get(`/finance/search?type=${type}&query=${encodeURIComponent(query)}`);
       setSearchResults(res.data);
       setShowSearchResults(true);
     } catch (error) {
@@ -90,7 +88,7 @@ export default function Finance({ user }) {
         contributor_id: donationForm.is_guest ? null : parseInt(donationForm.contributor_id),
         contributor_name: donationForm.is_guest ? donationForm.contributor_name : ''
       };
-      await apiClient.post('/finance/donations', payload, {
+      await apiClient.post('/finance/donations', payload);
       setShowDonationModal(false);
       setDonationForm({
         contributor_name: '',
@@ -113,12 +111,11 @@ export default function Finance({ user }) {
       return;
     }
     try {
-      const token = localStorage.getItem('token');
       const payload = {
         ...expenseForm,
         amount: parseFloat(expenseForm.amount)
       };
-      await apiClient.post('/finance/expenses', payload, {
+      await apiClient.post('/finance/expenses', payload);
       setShowExpenseModal(false);
       setExpenseForm({
         description: '',

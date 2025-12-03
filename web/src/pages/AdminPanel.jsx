@@ -25,8 +25,7 @@ export default function AdminPanel() {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await apiClient.get('/users', {
+      const res = await apiClient.get('/users');
       setUsers(res.data);
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -41,10 +40,10 @@ export default function AdminPanel() {
       return;
     }
     try {
-      const token = localStorage.getItem('token');
       await apiClient.put(
-        `/api/users/${selectedUser.id}/password`,
-        { new_password: newPassword },
+        `/users/${selectedUser.id}/password`,
+        { new_password: newPassword }
+      );
       setShowPasswordModal(false);
       setNewPassword('');
       setSelectedUser(null);
@@ -57,10 +56,10 @@ export default function AdminPanel() {
 
   const handleChangeRole = async () => {
     try {
-      const token = localStorage.getItem('token');
       await apiClient.put(
-        `/api/users/${selectedUser.id}/role`,
-        { role: selectedRole },
+        `/users/${selectedUser.id}/role`,
+        { role: selectedRole }
+      );
       setShowRoleModal(false);
       setSelectedUser(null);
       alert('Role updated successfully');
@@ -77,10 +76,10 @@ export default function AdminPanel() {
       return;
     }
     try {
-      const token = localStorage.getItem('token');
       await apiClient.post(
         '/users',
-        createForm,
+        createForm
+      );
       alert('User created successfully');
       setShowCreateModal(false);
       setCreateForm({ username: '', password: '', full_name: '', role: 'Player' });
@@ -93,9 +92,7 @@ export default function AdminPanel() {
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
     try {
-      const token = localStorage.getItem('token');
-      await apiClient.delete(
-        `/api/users/${userToDelete.id}`,
+      await apiClient.delete(`/users/${userToDelete.id}`);
       alert('User deleted successfully');
       setShowDeleteConfirm(false);
       setUserToDelete(null);

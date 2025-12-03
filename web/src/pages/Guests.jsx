@@ -11,10 +11,9 @@ export default function Guests() {
 
   const fetchGuests = async () => {
     try {
-      const token = localStorage.getItem('token');
       const [attendanceRes, donationsRes] = await Promise.all([
-        apiClient.get('/attendance', {
-        apiClient.get('/finance/donations', {
+        apiClient.get('/attendance'),
+        apiClient.get('/finance/donations')
       ]);
 
       // Get unique guests from attendance
