@@ -11,6 +11,7 @@ import AdminPanel from './pages/AdminPanel';
 import Navbar from './components/Navbar';
 
 function App() {
+  // Version: 2025-12-03-v2
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
