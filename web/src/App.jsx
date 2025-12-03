@@ -20,13 +20,25 @@ function App() {
     try {
       const token = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
-      if (token && userData) {
-        setIsAuthenticated(true);
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
+      
+      // Only try to parse if userData is not null and not the string 'undefined'
+      if (token && userData && userData !== 'undefined' && userData.trim().length > 0) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setIsAuthenticated(true);
+          setUser(parsedUser);
+        } catch (parseError) {
+          console.error('Failed to parse user data:', parseError);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      } else {
+        // Clear invalid data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       }
     } catch (error) {
-      console.error('Failed to parse user data:', error);
+      console.error('Error checking authentication:', error);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
