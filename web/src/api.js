@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configure axios base URL
 // If VITE_API_URL is set, use it; otherwise detect from current host
-let baseURL = process.env.VITE_API_URL;
+let baseURL = import.meta.env.VITE_API_URL;
 
 if (!baseURL) {
   // Default to localhost for development
