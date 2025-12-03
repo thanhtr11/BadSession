@@ -4,12 +4,11 @@ import axios from 'axios';
 // This allows the app to work with localhost, IP addresses, and custom domains
 const protocol = window.location.protocol; // http: or https:
 const hostname = window.location.hostname; // localhost, IP, or domain name
-const port = window.location.port; // Current port (3000, 80, 443, etc.)
 
 // Construct API URL
 let baseURL;
 if (protocol === 'https:') {
-  // For HTTPS, assume API is on same domain without explicit port (handled by reverse proxy)
+  // For HTTPS, API is proxied through same domain (nginx proxy manager handles it)
   baseURL = `${protocol}//${hostname}/api`;
 } else {
   // For HTTP (localhost/dev), use explicit port 9500
