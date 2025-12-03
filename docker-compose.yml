@@ -12,7 +12,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - bad_data:/var/lib/mysql
       - ./server/schema.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -58,7 +58,7 @@ services:
     command: npm run dev
 
 volumes:
-  mysql_data:
+  bad_data:
 
 networks:
   default:
