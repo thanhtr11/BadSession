@@ -7,10 +7,10 @@ let baseURL = process.env.VITE_API_URL;
 if (!baseURL) {
   // Default to localhost for development
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    baseURL = 'http://localhost:9500';
+    baseURL = 'http://localhost:9500/api';
   } else {
     // For custom domains, use the same hostname with API port
-    baseURL = `${window.location.protocol}//${window.location.hostname}:9500`;
+    baseURL = `${window.location.protocol}//${window.location.hostname}:9500/api`;
   }
 }
 
