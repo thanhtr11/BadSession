@@ -1,18 +1,12 @@
 import axios from 'axios';
 
-// Configure axios base URL
-// If VITE_API_URL is set, use it; otherwise detect from current host
-let baseURL = import.meta.env.VITE_API_URL;
+// Configure axios base URL dynamically based on current hostname
+// This allows the app to work with localhost, IP addresses, and custom domains
+const protocol = window.location.protocol; // http: or https:
+const hostname = window.location.hostname; // localhost, IP, or domain name
 
-if (!baseURL) {
-  // Construct API URL based on current hostname and port
-  // This allows the app to work with localhost, IP addresses, and custom domains
-  const protocol = window.location.protocol; // http: or https:
-  const hostname = window.location.hostname; // localhost, IP, or domain name
-  
-  // Always use port 9500 for the API server
-  baseURL = `${protocol}//${hostname}:9500/api`;
-}
+// Always use port 9500 for the API server
+const baseURL = `${protocol}//${hostname}:9500/api`;
 
 console.log('API Client configured with baseURL:', baseURL);
 
