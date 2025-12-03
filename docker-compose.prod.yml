@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
 
   server:
-    image: thanhtruongtien/badsession-server:latest
+    image: thanhtr/badsession-server:latest
     container_name: badsession-server
     depends_on:
       mysql:
@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
 
   web:
-    image: thanhtruongtien/badsession-web:latest
+    image: thanhtr/badsession-web:latest
     container_name: badsession-web
     depends_on:
       - server
