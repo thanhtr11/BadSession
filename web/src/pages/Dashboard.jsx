@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api';
 
 export default function Dashboard() {
   const [dashboard, setDashboard] = useState(null);

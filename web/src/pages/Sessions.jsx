@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import apiClient from '../api';
 
 export default function Sessions() {
@@ -316,6 +315,59 @@ export default function Sessions() {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Session Modal */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">➕ Create New Session</div>
+            <form onSubmit={handleCreateSession}>
+              <div className="form-group">
+                <label className="form-label">Date</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={formData.session_date}
+                  onChange={e => setFormData({ ...formData, session_date: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Time</label>
+                <input
+                  type="time"
+                  className="form-input"
+                  value={formData.session_time}
+                  onChange={e => setFormData({ ...formData, session_time: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Location</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={formData.location}
+                  onChange={e => setFormData({ ...formData, location: e.target.value })}
+                  placeholder="e.g., Court A, Main Hall"
+                  required
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="button btn-secondary" onClick={() => setShowModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="button btn-primary">
+                  Create Session
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
