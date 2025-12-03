@@ -14,9 +14,14 @@ if (!baseURL) {
   }
 }
 
+console.log('API Client configured with baseURL:', baseURL);
+
 const apiClient = axios.create({
   baseURL,
   timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 // Add token to requests
@@ -28,10 +33,11 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 responses
+// Handle responses and errors
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', error.message, error.response?.status, error.response?.data);
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
