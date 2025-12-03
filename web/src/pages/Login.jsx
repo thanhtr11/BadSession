@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import apiClient from '../api';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login({ onLogin }) {
@@ -25,16 +25,16 @@ export default function Login({ onLogin }) {
 
     try {
       if (isRegister) {
-        await axios.post('/api/auth/register', formData);
+        await apiClient.post('/auth/register', formData);
         // Auto-login after registration
-        const loginRes = await axios.post('/api/auth/login', {
+        const loginRes = await apiClient.post('/auth/login', {
           username: formData.username,
           password: formData.password
         });
         onLogin(loginRes.data.token, loginRes.data.user);
         navigate('/');
       } else {
-        const res = await axios.post('/api/auth/login', {
+        const res = await apiClient.post('/auth/login', {
           username: formData.username,
           password: formData.password
         });

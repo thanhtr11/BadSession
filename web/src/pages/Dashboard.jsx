@@ -11,10 +11,7 @@ export default function Dashboard() {
 
   const fetchDashboard = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('/api/dashboard', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await apiClient.get('/dashboard');
       setDashboard(res.data);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);

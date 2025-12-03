@@ -23,8 +23,14 @@ export default function Sessions() {
   const [editGuestName, setEditGuestName] = useState('');
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    setUser(userData);
+    try {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
+    } catch (error) {
+      console.error('Failed to parse user data:', error);
+    }
     fetchSessions();
   }, []);
 

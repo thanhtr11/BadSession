@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api';
 
 export default function Players() {
   const [players, setPlayers] = useState([]);
@@ -19,9 +19,7 @@ export default function Players() {
   const fetchPlayers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('/api/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await apiClient.get('/users', {
       setPlayers(res.data.filter(u => u.role === 'Player'));
     } catch (error) {
       console.error('Failed to fetch players:', error);
@@ -35,12 +33,8 @@ export default function Players() {
     try {
       const token = localStorage.getItem('token');
       const [attendanceRes, donationsRes] = await Promise.all([
-        axios.get(`/api/attendance/player/${player.id}/history`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('/api/finance/donations', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        apiClient.get(`/api/attendance/player/${player.id}/history`, {
+        apiClient.get('/finance/donations', {
       ]);
 
       const playerDonations = donationsRes.data.filter(d => d.contributor_id === player.id && !d.is_guest);

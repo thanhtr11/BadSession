@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api';
 
 export default function AdminPanel() {
   const [users, setUsers] = useState([]);
@@ -26,9 +26,7 @@ export default function AdminPanel() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('/api/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await apiClient.get('/users', {
       setUsers(res.data);
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -44,11 +42,9 @@ export default function AdminPanel() {
     }
     try {
       const token = localStorage.getItem('token');
-      await axios.put(
+      await apiClient.put(
         `/api/users/${selectedUser.id}/password`,
         { new_password: newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
       setShowPasswordModal(false);
       setNewPassword('');
       setSelectedUser(null);
@@ -62,11 +58,9 @@ export default function AdminPanel() {
   const handleChangeRole = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(
+      await apiClient.put(
         `/api/users/${selectedUser.id}/role`,
         { role: selectedRole },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
       setShowRoleModal(false);
       setSelectedUser(null);
       alert('Role updated successfully');
@@ -84,11 +78,9 @@ export default function AdminPanel() {
     }
     try {
       const token = localStorage.getItem('token');
-      await axios.post(
-        '/api/users',
+      await apiClient.post(
+        '/users',
         createForm,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
       alert('User created successfully');
       setShowCreateModal(false);
       setCreateForm({ username: '', password: '', full_name: '', role: 'Player' });
@@ -102,10 +94,8 @@ export default function AdminPanel() {
     if (!userToDelete) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(
+      await apiClient.delete(
         `/api/users/${userToDelete.id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
       alert('User deleted successfully');
       setShowDeleteConfirm(false);
       setUserToDelete(null);

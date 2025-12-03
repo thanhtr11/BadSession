@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api';
 
 export default function Guests() {
   const [guests, setGuests] = useState([]);
@@ -13,12 +13,8 @@ export default function Guests() {
     try {
       const token = localStorage.getItem('token');
       const [attendanceRes, donationsRes] = await Promise.all([
-        axios.get('/api/attendance', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('/api/finance/donations', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        apiClient.get('/attendance', {
+        apiClient.get('/finance/donations', {
       ]);
 
       // Get unique guests from attendance

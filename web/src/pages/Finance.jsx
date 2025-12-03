@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api';
 
 export default function Finance({ user }) {
   const [donations, setDonations] = useState([]);
@@ -32,15 +32,9 @@ export default function Finance({ user }) {
     try {
       const token = localStorage.getItem('token');
       const [donationsRes, expensesRes, summaryRes] = await Promise.all([
-        axios.get('/api/finance/donations', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('/api/finance/expenses', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('/api/finance/summary', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        apiClient.get('/finance/donations', {
+        apiClient.get('/finance/expenses', {
+        apiClient.get('/finance/summary', {
       ]);
       setDonations(donationsRes.data);
       setExpenses(expensesRes.data);
@@ -62,9 +56,7 @@ export default function Finance({ user }) {
     try {
       const token = localStorage.getItem('token');
       const type = donationForm.is_guest ? 'guest' : 'player';
-      const res = await axios.get(`/api/finance/search?type=${type}&query=${encodeURIComponent(query)}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await apiClient.get(`/api/finance/search?type=${type}&query=${encodeURIComponent(query)}`, {
       setSearchResults(res.data);
       setShowSearchResults(true);
     } catch (error) {
@@ -98,9 +90,7 @@ export default function Finance({ user }) {
         contributor_id: donationForm.is_guest ? null : parseInt(donationForm.contributor_id),
         contributor_name: donationForm.is_guest ? donationForm.contributor_name : ''
       };
-      await axios.post('/api/finance/donations', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.post('/finance/donations', payload, {
       setShowDonationModal(false);
       setDonationForm({
         contributor_name: '',
@@ -128,9 +118,7 @@ export default function Finance({ user }) {
         ...expenseForm,
         amount: parseFloat(expenseForm.amount)
       };
-      await axios.post('/api/finance/expenses', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.post('/finance/expenses', payload, {
       setShowExpenseModal(false);
       setExpenseForm({
         description: '',
