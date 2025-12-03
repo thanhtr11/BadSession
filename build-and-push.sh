@@ -14,12 +14,12 @@ echo "Platforms: $PLATFORMS"
 # Build and push server image
 echo ""
 echo "Building server image..."
-docker buildx build --platform $PLATFORMS -t $DOCKER_USERNAME/badsession-server:$IMAGE_TAG --push ./server
+docker buildx build --platform $PLATFORMS -f ./server/Dockerfile.prod -t $DOCKER_USERNAME/badsession-server:$IMAGE_TAG --push ./server
 
 # Build and push web image
 echo ""
 echo "Building web image..."
-docker buildx build --platform $PLATFORMS -t $DOCKER_USERNAME/badsession-web:$IMAGE_TAG --push ./web
+docker buildx build --platform $PLATFORMS -f ./web/Dockerfile.prod -t $DOCKER_USERNAME/badsession-web:$IMAGE_TAG --push ./web
 
 echo ""
 echo "Done! Images pushed to Docker Hub:"
