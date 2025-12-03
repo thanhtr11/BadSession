@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: badsession-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: badsession
+      MYSQL_USER: badsession
+      MYSQL_PASSWORD: badsession_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - bad_data:/var/lib/mysql
+      - ./server/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  server:
+    image: thanhtruongtien/badsession-server:latest
+    container_name: badsession-server
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_USER: badsession
+      DB_PASSWORD: badsession_password
+      DB_NAME: badsession
+      PORT: 9500
+      JWT_SECRET: your-secret-key-change-in-production
+    ports:
+      - "9500:9500"
+    restart: unless-stopped
+
+  web:
+    image: thanhtruongtien/badsession-web:latest
+    container_name: badsession-web
+    depends_on:
+      - server
+    environment:
+      VITE_API_URL: http://localhost:9500
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  bad_data:
+
+networks:
+  default:
+    name: badsession-network
