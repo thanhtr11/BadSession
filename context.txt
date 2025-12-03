@@ -1,0 +1,36 @@
+Login Screen: Include register and login with username and password. Register have Full name.
+
+Admin Panel:
+Default admin account with username and password: Admin
+Change password for player
+List of player and can change role Admin, Player
+
+
+Dashboard: Admin and Player can see this section
+Show Number of player, guest
+Show remaining fund
+Show total fund in 30 days
+Show total expense in 30 days
+Show 5 recent donation 
+Show 5 recent expense
+Show 5 recent Sessions
+
+Session:
+Admin role can create session with Date, Time and Location
+Admin and Player role only self check-in and check-in for Guest.
+When check-in for Guest, fill Guest full name
+
+Players:
+Show full list of player
+In each player show session history, donation history and total donation
+
+Guest
+Show full list of Guest
+In each Guest show session history, donation history and total donation
+
+Finance: only admin can change value in this section
+Create Donation records and expense records
+Show list of record
+Show total fund
+Show total expense
+Show remain fund

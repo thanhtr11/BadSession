@@ -1,0 +1,76 @@
+import React, { useState, useEffect } from 'react';
+import './styles.css';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Sessions from './pages/Sessions';
+import Players from './pages/Players';
+import Guests from './pages/Guests';
+import Finance from './pages/Finance';
+import AdminPanel from './pages/AdminPanel';
+import Navbar from './components/Navbar';
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    console.log('App mounted, checking authentication');
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (token && userData) {
+      setIsAuthenticated(true);
+      setUser(JSON.parse(userData));
+    }
+    setLoading(false);
+  }, []);
+
+  const handleLogin = (token, userData) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setIsAuthenticated(true);
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setUser(null);
+  };
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  return (
+    <Router>
+      {isAuthenticated ? (
+        <div className="app-container">
+          <Navbar user={user} onLogout={handleLogout} />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/sessions" element={<Sessions />} />
+              <Route path="/players" element={<Players />} />
+              <Route path="/guests" element={<Guests />} />
+              <Route path="/finance" element={<Finance user={user} />} />
+              {user?.role === 'Admin' && (
+                <Route path="/admin" element={<AdminPanel />} />
+              )}
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </main>
+        </div>
+      ) : (
+        <Routes>
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      )}
+    </Router>
+  );
+}
+
+export default App;
