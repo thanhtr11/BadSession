@@ -69,6 +69,25 @@ export default function FinanceExpense({ user }) {
     }
   };
 
+  const handleDeleteExpense = async (expenseId) => {
+    if (user?.role !== 'Admin') {
+      alert('Only admins can delete records');
+      return;
+    }
+    if (!window.confirm('Are you sure you want to delete this expense record? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      await apiClient.delete(`/finance/expenses/${expenseId}`);
+      // Remove the expense from the local state
+      setExpenses(expenses.filter(e => e.id !== expenseId));
+      alert('Expense record deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete expense record:', error);
+      alert('Failed to delete expense record');
+    }
+  };
+
   if (loading) return <div className="loading">Loading Expense Records...</div>;
 
   return (
@@ -131,7 +150,8 @@ export default function FinanceExpense({ user }) {
                         color: 'white',
                         transition: 'all 0.3s ease',
                         transform: 'scale(1)',
-                        opacity: 1
+                        opacity: 1,
+                        marginRight: '4px'
                       }}
                       onMouseEnter={(e) => {
                         e.target.style.transform = 'scale(1.05)';
@@ -143,6 +163,33 @@ export default function FinanceExpense({ user }) {
                       }}
                     >
                       {expense.is_paid ? '✓ Paid' : '💰 Pay'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteExpense(expense.id)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        backgroundColor: '#c0392b',
+                        color: 'white',
+                        transition: 'all 0.3s ease',
+                        transform: 'scale(1)',
+                        opacity: 1
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'scale(1.05)';
+                        e.target.style.opacity = '0.9';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.opacity = '1';
+                      }}
+                      title="Delete expense record"
+                    >
+                      🗑️ Delete
                     </button>
                   </td>
                 )}

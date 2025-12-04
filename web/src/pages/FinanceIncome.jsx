@@ -116,6 +116,25 @@ export default function FinanceIncome({ user }) {
     }
   };
 
+  const handleDeleteIncome = async (donationId) => {
+    if (user?.role !== 'Admin') {
+      alert('Only admins can delete records');
+      return;
+    }
+    if (!window.confirm('Are you sure you want to delete this income record? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      await apiClient.delete(`/finance/income/${donationId}`);
+      // Remove the donation from the local state
+      setDonations(donations.filter(d => d.id !== donationId));
+      alert('Income record deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete income record:', error);
+      alert('Failed to delete income record');
+    }
+  };
+
   if (loading) return <div className="loading">Loading Income Records...</div>;
 
   return (
@@ -167,7 +186,7 @@ export default function FinanceIncome({ user }) {
                       style={{
                         padding: '6px 16px',
                         fontSize: '12px',
-                        margin: 0,
+                        margin: '0 4px 0 0',
                         border: 'none',
                         borderRadius: '4px',
                         fontWeight: 'bold',
@@ -186,6 +205,32 @@ export default function FinanceIncome({ user }) {
                       }}
                     >
                       {donation.is_paid ? '✓ Paid' : '💰 Pay'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteIncome(donation.id)}
+                      style={{
+                        padding: '6px 16px',
+                        fontSize: '12px',
+                        margin: 0,
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        backgroundColor: '#c0392b',
+                        color: 'white'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.opacity = '0.9';
+                        e.target.style.transform = 'scale(1.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.opacity = '1';
+                        e.target.style.transform = 'scale(1)';
+                      }}
+                      title="Delete income record"
+                    >
+                      🗑️ Delete
                     </button>
                   </td>
                 )}

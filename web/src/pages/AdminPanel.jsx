@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
+import AdminSystemSettings from './AdminSystemSettings';
 
 export default function AdminPanel() {
+  const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -108,81 +110,134 @@ export default function AdminPanel() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1 className="page-title">⚙️ Admin Panel</h1>
-        <button className="button btn-success" onClick={() => setShowCreateModal(true)}>
-          ➕ Create User
+      </div>
+
+      {/* Tab Navigation */}
+      <div style={{
+        display: 'flex',
+        gap: '10px',
+        marginBottom: '20px',
+        borderBottom: '2px solid #ecf0f1',
+        paddingBottom: '10px'
+      }}>
+        <button
+          onClick={() => setActiveTab('users')}
+          style={{
+            padding: '10px 20px',
+            background: activeTab === 'users' ? '#3498db' : '#ecf0f1',
+            color: activeTab === 'users' ? 'white' : '#2c3e50',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: activeTab === 'users' ? 'bold' : 'normal',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          👥 User Management
+        </button>
+        <button
+          onClick={() => setActiveTab('settings')}
+          style={{
+            padding: '10px 20px',
+            background: activeTab === 'settings' ? '#3498db' : '#ecf0f1',
+            color: activeTab === 'settings' ? 'white' : '#2c3e50',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: activeTab === 'settings' ? 'bold' : 'normal',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          🔄 System Settings
         </button>
       </div>
 
-      <div className="section">
-        <h2 className="section-title">👥 Player Management</h2>
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Full Name</th>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Joined</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(user => (
-                <tr key={user.id}>
-                  <td>{user.full_name}</td>
-                  <td>{user.username}</td>
-                  <td>
-                    <span style={{
-                      padding: '4px 10px',
-                      borderRadius: '4px',
-                      background: user.role === 'Admin' ? '#e74c3c' : '#17a2b8',
-                      color: 'white',
-                      fontSize: '12px'
-                    }}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td>{new Date(user.created_at).toLocaleDateString()}</td>
-                  <td>
-                    <button
-                      className="button btn-primary btn-small"
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setSelectedRole(user.role);
-                        setShowRoleModal(true);
-                      }}
-                      style={{ marginRight: '5px' }}
-                    >
-                      Change Role
-                    </button>
-                    <button
-                      className="button btn-secondary btn-small"
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setNewPassword('');
-                        setShowPasswordModal(true);
-                      }}
-                      style={{ marginRight: '5px' }}
-                    >
-                      Change Password
-                    </button>
-                    <button
-                      className="button btn-danger btn-small"
-                      onClick={() => {
-                        setUserToDelete(user);
-                        setShowDeleteConfirm(true);
-                      }}
-                      disabled={user.id === 1}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* User Management Tab */}
+      {activeTab === 'users' && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 className="section-title">👥 User Management</h2>
+            <button className="button btn-success" onClick={() => setShowCreateModal(true)}>
+              ➕ Create User
+            </button>
+          </div>
+          <div className="section">
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map(user => (
+                    <tr key={user.id}>
+                      <td>{user.full_name}</td>
+                      <td>{user.username}</td>
+                      <td>
+                        <span style={{
+                          padding: '4px 10px',
+                          borderRadius: '4px',
+                          background: user.role === 'Admin' ? '#e74c3c' : '#17a2b8',
+                          color: 'white',
+                          fontSize: '12px'
+                        }}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                      <td>
+                        <button
+                          className="button btn-primary btn-small"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setSelectedRole(user.role);
+                            setShowRoleModal(true);
+                          }}
+                          style={{ marginRight: '5px' }}
+                        >
+                          Change Role
+                        </button>
+                        <button
+                          className="button btn-secondary btn-small"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setNewPassword('');
+                            setShowPasswordModal(true);
+                          }}
+                          style={{ marginRight: '5px' }}
+                        >
+                          Change Password
+                        </button>
+                        <button
+                          className="button btn-danger btn-small"
+                          onClick={() => {
+                            setUserToDelete(user);
+                            setShowDeleteConfirm(true);
+                          }}
+                          disabled={user.id === 1}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* System Settings Tab */}
+      {activeTab === 'settings' && (
+        <AdminSystemSettings users={users} onUserUpdated={fetchUsers} />
+      )}
+
 
       {/* Create User Modal */}
       {showCreateModal && (

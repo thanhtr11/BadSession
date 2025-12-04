@@ -523,4 +523,56 @@ router.post('/apply-player-income', authenticateToken, authorizeRole('Admin'), a
   }
 });
 
+// Delete income record (Admin only)
+router.delete('/income/:id', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
+  try {
+    const { id } = req.params;
+
+    connection = await pool.getConnection();
+
+    const [result] = await connection.execute(
+      'DELETE FROM donations WHERE id = ?',
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Income record not found' });
+    }
+
+    res.json({ message: 'Income record deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting income record:', error);
+    res.status(500).json({ error: 'Failed to delete income record' });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Delete expense record (Admin only)
+router.delete('/expenses/:id', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
+  try {
+    const { id } = req.params;
+
+    connection = await pool.getConnection();
+
+    const [result] = await connection.execute(
+      'DELETE FROM expenses WHERE id = ?',
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Expense record not found' });
+    }
+
+    res.json({ message: 'Expense record deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting expense record:', error);
+    res.status(500).json({ error: 'Failed to delete expense record' });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
 module.exports = router;
