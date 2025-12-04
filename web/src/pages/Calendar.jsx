@@ -95,9 +95,14 @@ export default function Calendar() {
       const dateStr = `${year}-${month}-${day}`;
       
       console.log('Selected date:', dateStr);
-      console.log('Available sessions:', sessions.map(s => s.session_date));
+      console.log('Available sessions:', sessions.map(s => ({ date: s.session_date, match: s.session_date.split('T')[0] })));
       
-      const filtered = sessions.filter(s => s.session_date === dateStr);
+      // Match both formats: extract just the date part (YYYY-MM-DD) from ISO format
+      const filtered = sessions.filter(s => {
+        const sessionDateStr = s.session_date.split('T')[0];
+        return sessionDateStr === dateStr;
+      });
+      
       console.log('Filtered sessions:', filtered);
       
       setSelectedDateSessions(filtered);
@@ -136,7 +141,12 @@ export default function Calendar() {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const dayStr = String(date.getDate()).padStart(2, '0');
     const dateStr = `${year}-${month}-${dayStr}`;
-    return sessions.filter(s => s.session_date === dateStr).length;
+    
+    // Match both formats: YYYY-MM-DD and YYYY-MM-DDTHH:MM:SS
+    return sessions.filter(s => {
+      const sessionDateStr = s.session_date.split('T')[0]; // Extract just the date part
+      return sessionDateStr === dateStr;
+    }).length;
   };
 
   const getDaysArray = () => {
