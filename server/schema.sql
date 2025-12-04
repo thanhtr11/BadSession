@@ -77,4 +77,4 @@ VALUES (1, 0, 0);
 
 -- Insert default admin user
 INSERT IGNORE INTO users (id, username, password, full_name, role) 
-VALUES (1, 'Admin', '$2a$10$ONjMvl0qAgPrXM5mLKgOoOMhy6M6bR1wCGzJWtoWGJkitdKRESkbC', 'Administrator', 'Admin');
+VALUES (1, 'Admin', '$2a$10$rMfB/8ga/rO95ttGQEO.behPAab0zeiAwdeNMrEAvXerW6PxC7lQ2', 'Administrator', 'Admin');
