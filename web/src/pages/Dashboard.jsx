@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
+import { formatVND } from '../utils/format';
 
 export default function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
@@ -38,21 +39,21 @@ export default function Dashboard() {
         </div>
         <div className="stat-card">
           <div className="stat-label">Total Income</div>
-          <div className="stat-value">VND {dashboard?.total_donations?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">{formatVND(dashboard?.total_donations)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Remaining Fund</div>
           <div className="stat-value" style={{ color: dashboard?.remaining_fund >= 0 ? '#27ae60' : '#e74c3c' }}>
-            VND {dashboard?.remaining_fund?.toFixed(2) || '0.00'}
+            {formatVND(dashboard?.remaining_fund)}
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Income (30 days)</div>
-          <div className="stat-value">VND {dashboard?.donations_30_days?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">{formatVND(dashboard?.donations_30_days)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Expenses (30 days)</div>
-          <div className="stat-value">VND {dashboard?.expenses_30_days?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">{formatVND(dashboard?.expenses_30_days)}</div>
         </div>
       </div>
 
@@ -98,7 +99,7 @@ export default function Dashboard() {
               {dashboard?.recent_donations?.map(donation => (
                 <tr key={donation.id}>
                   <td>{donation.contributor_full_name || 'Anonymous'}</td>
-                  <td>VND {parseFloat(donation.amount).toFixed(2)}</td>
+                  <td>{formatVND(donation.amount)}</td>
                   <td>{new Date(donation.donated_at).toLocaleDateString()}</td>
                 </tr>
               ))}
@@ -123,7 +124,7 @@ export default function Dashboard() {
               {dashboard?.recent_expenses?.map(expense => (
                 <tr key={expense.id}>
                   <td>{expense.description}</td>
-                  <td>VND {parseFloat(expense.amount).toFixed(2)}</td>
+                  <td>{formatVND(expense.amount)}</td>
                   <td>{expense.category || 'N/A'}</td>
                   <td>{new Date(expense.recorded_at).toLocaleDateString()}</td>
                 </tr>

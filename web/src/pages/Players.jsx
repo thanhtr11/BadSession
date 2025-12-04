@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
+import { formatVND } from '../utils/format';
 
 export default function Players() {
   const [players, setPlayers] = useState([]);
@@ -99,7 +100,7 @@ export default function Players() {
                   <strong>Username:</strong> {selectedPlayer.username}
                 </div>
                 <div style={{ marginBottom: '10px' }}>
-                  <strong>Total Income:</strong> VND {Number(playerDetails.total_donations || 0).toFixed(2)}
+                  <strong>Total Income:</strong> {formatVND(playerDetails.total_donations)}
                 </div>
                 <div>
                   <strong>Sessions Attended:</strong> {playerDetails.attendance.length}
@@ -146,7 +147,7 @@ export default function Players() {
                     <tbody>
                       {playerDetails.donations.map(donation => (
                         <tr key={donation.id}>
-                          <td>VND {Number(donation.amount || 0).toFixed(2)}</td>
+                          <td>{formatVND(donation.amount)}</td>
                           <td>{new Date(donation.donated_at).toLocaleDateString()}</td>
                           <td>{donation.notes || '-'}</td>
                         </tr>

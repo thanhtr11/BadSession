@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
+import { formatVND } from '../utils/format';
 
 export default function Guests() {
   const [guests, setGuests] = useState([]);
@@ -73,7 +74,7 @@ export default function Guests() {
         </div>
             <div className="stat-card">
               <div className="stat-label">Total Guest Income</div>
-              <div className="stat-value">VND {Number(guests.reduce((sum, g) => sum + g.donations, 0) || 0).toFixed(2)}</div>
+              <div className="stat-value">{formatVND(guests.reduce((sum, g) => sum + g.donations, 0))}</div>
         </div>
       </div>
 
@@ -92,7 +93,7 @@ export default function Guests() {
                 <tr key={idx}>
                   <td>{guest.name}</td>
                   <td>{guest.sessions}</td>
-                    <td>VND {Number(guest.donations || 0).toFixed(2)}</td>
+                    <td>{formatVND(guest.donations)}</td>
                 </tr>
               ))}
             </tbody>
