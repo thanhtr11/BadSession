@@ -34,18 +34,19 @@ export default function Navbar({ user, onLogout }) {
         ☰
       </button>
 
-      <button
-        className="sidebar-toggle"
-        aria-label="Toggle sidebar"
-        onClick={toggleSidebar}
-        title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-      >
-        {sidebarCollapsed ? '→' : '←'}
-      </button>
-
       <div className="navbar-header">
-        <div className="navbar-title">🏸 BadSession</div>
-        <div className="navbar-subtitle">Team Management</div>
+        <div>
+          <div className="navbar-title">🏸 BadSession</div>
+          <div className="navbar-subtitle">Team Management</div>
+        </div>
+        <button
+          className="sidebar-toggle"
+          aria-label="Toggle sidebar"
+          onClick={toggleSidebar}
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {sidebarCollapsed ? '→' : '←'}
+        </button>
       </div>
 
       <div className="user-info">
