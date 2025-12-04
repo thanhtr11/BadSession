@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
+import { formatVND } from '../utils/format';
 
 export default function Finance({ user }) {
   const [donations, setDonations] = useState([]);
@@ -153,27 +154,27 @@ export default function Finance({ user }) {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-label">Total Income</div>
-          <div className="stat-value">VND {summary?.total_donations?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">{formatVND(summary?.total_donations)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Total Expenses</div>
-          <div className="stat-value">VND {summary?.total_expenses?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">{formatVND(summary?.total_expenses)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label" style={{ color: summary?.remaining_fund >= 0 ? '#27ae60' : '#e74c3c' }}>
             Remaining Fund
           </div>
           <div className="stat-value" style={{ color: summary?.remaining_fund >= 0 ? '#27ae60' : '#e74c3c' }}>
-            VND {summary?.remaining_fund?.toFixed(2) || '0.00'}
+            {formatVND(summary?.remaining_fund)}
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Income (30 days)</div>
-          <div className="stat-value">VND {summary?.donations_30_days?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">{formatVND(summary?.donations_30_days)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Expenses (30 days)</div>
-          <div className="stat-value">VND {summary?.expenses_30_days?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">{formatVND(summary?.expenses_30_days)}</div>
         </div>
       </div>
 
@@ -194,7 +195,7 @@ export default function Finance({ user }) {
               {donations.map(donation => (
                 <tr key={donation.id}>
                   <td>{donation.contributor_full_name || donation.contributor_name || 'Anonymous'}</td>
-                  <td>VND {parseFloat(donation.amount).toFixed(2)}</td>
+                  <td>{formatVND(donation.amount)}</td>
                   <td>{new Date(donation.donated_at).toLocaleDateString()}</td>
                   <td>{donation.notes || '-'}</td>
                 </tr>
@@ -222,7 +223,7 @@ export default function Finance({ user }) {
               {expenses.map(expense => (
                 <tr key={expense.id}>
                   <td>{expense.description}</td>
-                  <td>VND {parseFloat(expense.amount).toFixed(2)}</td>
+                  <td>{formatVND(expense.amount)}</td>
                   <td>{expense.category || '-'}</td>
                   <td>{expense.full_name}</td>
                   <td>{new Date(expense.recorded_at).toLocaleDateString()}</td>
