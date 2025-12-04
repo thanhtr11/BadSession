@@ -272,7 +272,7 @@ export default function Sessions() {
                               )}
                             </p>
                             <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: '#666' }}>
-                              {att.formatted_check_in_time || 'N/A'}
+                              {att.formatted_check_in_time || (att.check_in_time ? new Date(att.check_in_time).toLocaleString() : 'N/A')}
                             </p>
                           </div>
                           {(
