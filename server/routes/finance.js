@@ -60,7 +60,7 @@ router.get('/donations', authenticateToken, async (req, res) => {
     const connection = await pool.getConnection();
 
     const [donations] = await connection.execute(
-      `SELECT d.id, d.contributor_id, d.contributor_name, d.is_guest, d.amount, d.notes, d.donated_at,
+      `SELECT d.id, d.contributor_id, d.contributor_name, d.is_guest, d.amount, d.notes, d.is_paid, d.donated_at,
               CASE WHEN d.is_guest THEN d.contributor_name ELSE u.full_name END as contributor_full_name
        FROM donations d
        LEFT JOIN users u ON d.contributor_id = u.id
@@ -193,7 +193,7 @@ router.get('/income', authenticateToken, async (req, res) => {
     const connection = await pool.getConnection();
 
     const [income] = await connection.execute(
-      `SELECT d.id, d.contributor_id, d.contributor_name, d.is_guest, d.amount, d.notes, d.donated_at,
+      `SELECT d.id, d.contributor_id, d.contributor_name, d.is_guest, d.amount, d.notes, d.is_paid, d.donated_at,
               CASE WHEN d.is_guest THEN d.contributor_name ELSE u.full_name END as contributor_full_name
        FROM donations d
        LEFT JOIN users u ON d.contributor_id = u.id
