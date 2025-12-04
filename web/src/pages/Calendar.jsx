@@ -85,8 +85,18 @@ export default function Calendar() {
   // Get sessions for selected date
   useEffect(() => {
     if (selectedDate) {
-      const dateStr = selectedDate.toISOString().split('T')[0];
+      // Format date as YYYY-MM-DD using local timezone (not UTC)
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      console.log('Selected date:', dateStr);
+      console.log('Available sessions:', sessions.map(s => s.session_date));
+      
       const filtered = sessions.filter(s => s.session_date === dateStr);
+      console.log('Filtered sessions:', filtered);
+      
       setSelectedDateSessions(filtered);
     }
   }, [selectedDate, sessions]);
@@ -118,9 +128,11 @@ export default function Calendar() {
   };
 
   const getDaySessionCount = (day) => {
-    const dateStr = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
-      .toISOString()
-      .split('T')[0];
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayStr}`;
     return sessions.filter(s => s.session_date === dateStr).length;
   };
 
