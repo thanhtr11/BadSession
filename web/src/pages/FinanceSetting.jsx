@@ -3,12 +3,8 @@ import apiClient from '../api';
 import { formatVND } from '../utils/format';
 
 export default function FinanceSetting({ user }) {
-  const [playerMonthlyRate, setPlayerMonthlyRate] = useState(0);
-  const [playerMonthlyYear, setPlayerMonthlyYear] = useState(new Date().getFullYear());
-  const [playerMonthlyMonth, setPlayerMonthlyMonth] = useState(new Date().getMonth() + 1);
   const [guestDailyRate, setGuestDailyRate] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [savingPlayer, setSavingPlayer] = useState(false);
   const [savingGuest, setSavingGuest] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
@@ -21,9 +17,6 @@ export default function FinanceSetting({ user }) {
     try {
       const res = await apiClient.get('/finance/settings');
       if (res.data) {
-        setPlayerMonthlyRate(res.data.player_monthly_rate || 0);
-        setPlayerMonthlyYear(res.data.player_monthly_year || new Date().getFullYear());
-        setPlayerMonthlyMonth(res.data.player_monthly_month || new Date().getMonth() + 1);
         setGuestDailyRate(res.data.guest_daily_rate || 0);
       }
     } catch (error) {
@@ -41,30 +34,6 @@ export default function FinanceSetting({ user }) {
     setTimeout(() => setMessage(''), 3000);
   };
 
-  const handleSavePlayerRate = async (e) => {
-    e.preventDefault();
-    if (user?.role !== 'Admin') {
-      showMessage('Only admins can change settings', 'error');
-      return;
-    }
-
-    setSavingPlayer(true);
-    try {
-      await apiClient.post('/finance/settings', {
-        player_monthly_rate: parseFloat(playerMonthlyRate),
-        player_monthly_year: parseInt(playerMonthlyYear),
-        player_monthly_month: parseInt(playerMonthlyMonth),
-        guest_daily_rate: parseFloat(guestDailyRate)
-      });
-      showMessage('✓ Player Monthly Rate saved successfully!', 'success');
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-      showMessage('Failed to save player rate', 'error');
-    } finally {
-      setSavingPlayer(false);
-    }
-  };
-
   const handleSaveGuestRate = async (e) => {
     e.preventDefault();
     if (user?.role !== 'Admin') {
@@ -75,10 +44,10 @@ export default function FinanceSetting({ user }) {
     setSavingGuest(true);
     try {
       await apiClient.post('/finance/settings', {
-        player_monthly_rate: parseFloat(playerMonthlyRate),
-        player_monthly_year: parseInt(playerMonthlyYear),
-        player_monthly_month: parseInt(playerMonthlyMonth),
-        guest_daily_rate: parseFloat(guestDailyRate)
+        guest_daily_rate: parseFloat(guestDailyRate),
+        player_monthly_rate: 0,
+        player_monthly_year: null,
+        player_monthly_month: null
       });
       showMessage('✓ Guest Daily Rate saved successfully!', 'success');
     } catch (error) {
@@ -109,16 +78,9 @@ export default function FinanceSetting({ user }) {
     );
   }
 
-  // Generate year and month options
-  const currentYear = new Date().getFullYear();
-  const years = [];
-  for (let i = currentYear - 5; i <= currentYear + 5; i++) {
-    years.push(i);
-  }
-
   return (
     <div>
-      <h2 className="section-title">⚙️ Finance Settings</h2>
+      <h2 className="section-title">⚙️ Guest Income Settings</h2>
 
       <div style={{ maxWidth: '700px', margin: '0 auto' }}>
         {message && (
@@ -136,97 +98,6 @@ export default function FinanceSetting({ user }) {
           </div>
         )}
 
-        {/* Player Monthly Income Rate Section */}
-        <div style={{
-          backgroundColor: '#f8f9fa',
-          border: '1px solid #dee2e6',
-          borderRadius: '8px',
-          padding: '20px',
-          marginBottom: '25px'
-        }}>
-          <h3 style={{ margin: '0 0 15px 0', fontSize: '16px', fontWeight: 'bold', color: '#2c3e50' }}>
-            👤 Player Monthly Income Rate
-          </h3>
-          <p style={{ fontSize: '12px', color: '#7f8c8d', marginBottom: '15px' }}>
-            Default income amount charged per player per month
-          </p>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '8px' }}>
-              Period (Year - Month)
-            </label>
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-              <div style={{ flex: 1 }}>
-                <select
-                  className="form-select"
-                  value={playerMonthlyYear}
-                  onChange={(e) => setPlayerMonthlyYear(e.target.value)}
-                  style={{ width: '100%' }}
-                >
-                  {years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-              </div>
-              <div style={{ flex: 1 }}>
-                <select
-                  className="form-select"
-                  value={playerMonthlyMonth}
-                  onChange={(e) => setPlayerMonthlyMonth(e.target.value)}
-                  style={{ width: '100%' }}
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                    <option key={month} value={month}>
-                      {new Date(2024, month - 1).toLocaleString('default', { month: 'long' })}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#555', display: 'block', marginBottom: '8px' }}>
-              Amount (VND)
-            </label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '18px', fontWeight: 'bold', minWidth: '160px', color: '#27ae60' }}>
-                {formatVND(playerMonthlyRate)}
-              </span>
-              <input
-                type="number"
-                step="1000"
-                min="0"
-                className="form-input"
-                value={playerMonthlyRate}
-                onChange={(e) => setPlayerMonthlyRate(e.target.value)}
-                placeholder="Enter amount in VND"
-                style={{ flex: 1 }}
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={handleSavePlayerRate}
-            disabled={savingPlayer}
-            style={{
-              width: '100%',
-              padding: '10px',
-              backgroundColor: savingPlayer ? '#95a5a6' : '#3498db',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontWeight: 'bold',
-              cursor: savingPlayer ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.3s'
-            }}
-            onMouseEnter={(e) => !savingPlayer && (e.target.style.backgroundColor = '#2980b9')}
-            onMouseLeave={(e) => !savingPlayer && (e.target.style.backgroundColor = '#3498db')}
-          >
-            {savingPlayer ? '💾 Saving...' : '💾 Save Player Rate'}
-          </button>
-        </div>
-
         {/* Guest Daily Income Rate Section */}
         <div style={{
           backgroundColor: '#f8f9fa',
@@ -239,7 +110,7 @@ export default function FinanceSetting({ user }) {
             🧑 Guest Daily Income Rate
           </h3>
           <p style={{ fontSize: '12px', color: '#7f8c8d', marginBottom: '15px' }}>
-            Default income amount charged per guest per day
+            Default income amount charged per guest per day. This amount is automatically recorded when guests check in.
           </p>
 
           <div style={{ marginBottom: '15px' }}>
@@ -298,8 +169,8 @@ export default function FinanceSetting({ user }) {
         >
           <strong>ℹ️ Info:</strong>
           <ul style={{ margin: '8px 0 0 20px', paddingLeft: '10px' }}>
-            <li>Player Monthly Rate: Period indicates the month/year this rate applies to</li>
             <li>Guest Daily Rate: Applied automatically when guests check in</li>
+            <li>Player monthly rates are now configured in the "Player Income" tab</li>
             <li>Changes are saved immediately when you click the save button</li>
             <li>All rates are in Vietnamese Dong (VND)</li>
           </ul>
