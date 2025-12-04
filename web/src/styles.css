@@ -497,6 +497,28 @@ tr:hover {
     z-index: 999;
   }
 
+  /* make navbar sit above content on mobile */
+  .navbar {
+    z-index: 1000;
+  }
+
+  /* mobile backdrop to close menu */
+  .mobile-backdrop {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.2);
+    z-index: 998;
+  }
+
+  /* show logout inside mobile menu */
+  .nav-menu.open + .logout-btn {
+    display: block;
+    margin: 12px 20px;
+  }
+
   .nav-item {
     margin-bottom: 10px;
   }

@@ -61,8 +61,9 @@ export default function Navbar({ user, onLogout }) {
           </li>
         )}
       </ul>
+  {menuOpen && <div className="mobile-backdrop" onClick={() => setMenuOpen(false)} />}
 
-      <button className="logout-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>🚪 Logout</button>
+  <button className="logout-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>🚪 Logout</button>
     </nav>
   );
 }
