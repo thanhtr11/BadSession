@@ -99,7 +99,7 @@ export default function Finance({ user }) {
                 display: 'inline-block'
               }}
             >
-              ⚙️ Settings
+              🧑 Guest Income
             </Link>
             <Link
               to="/finance/player-income"
