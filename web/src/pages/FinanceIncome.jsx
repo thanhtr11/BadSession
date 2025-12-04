@@ -103,11 +103,16 @@ export default function FinanceIncome({ user }) {
       return;
     }
     try {
-      await apiClient.post(`/finance/income/${donationId}/paid`);
-      fetchIncome();
+      const response = await apiClient.post(`/finance/income/${donationId}/toggle-paid`);
+      // Update the donation in the local state immediately
+      setDonations(donations.map(d => 
+        d.id === donationId ? { ...d, is_paid: response.data.is_paid } : d
+      ));
     } catch (error) {
-      console.error('Failed to mark as paid:', error);
-      alert('Failed to mark as paid');
+      console.error('Failed to toggle paid status:', error);
+      alert('Failed to toggle paid status');
+      // Refresh to show correct state if error
+      fetchIncome();
     }
   };
 

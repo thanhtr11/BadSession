@@ -269,6 +269,41 @@ router.post('/income/:id/paid', authenticateToken, authorizeRole('Admin'), async
   }
 });
 
+// Toggle income record paid status (Admin only)
+router.post('/income/:id/toggle-paid', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const connection = await pool.getConnection();
+
+    // Get current paid status
+    const [donation] = await connection.execute(
+      'SELECT is_paid FROM donations WHERE id = ?',
+      [id]
+    );
+
+    if (donation.length === 0) {
+      await connection.release();
+      return res.status(404).json({ error: 'Income record not found' });
+    }
+
+    const newPaidStatus = !donation[0].is_paid;
+
+    // Toggle the paid status
+    await connection.execute(
+      'UPDATE donations SET is_paid = ? WHERE id = ?',
+      [newPaidStatus, id]
+    );
+
+    await connection.release();
+
+    res.json({ message: 'Income record status toggled', is_paid: newPaidStatus });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to toggle paid status' });
+  }
+});
+
 // Get finance settings
 router.get('/settings', authenticateToken, async (req, res) => {
   try {
