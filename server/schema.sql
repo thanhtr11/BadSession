@@ -65,6 +65,8 @@ CREATE TABLE IF NOT EXISTS expenses (
 CREATE TABLE IF NOT EXISTS finance_settings (
   id INT PRIMARY KEY DEFAULT 1,
   player_monthly_rate DECIMAL(10, 2) DEFAULT 0,
+  player_monthly_year INT,
+  player_monthly_month INT,
   guest_daily_rate DECIMAL(10, 2) DEFAULT 0,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

@@ -353,11 +353,16 @@ router.get('/settings', authenticateToken, async (req, res) => {
     connection = await pool.getConnection();
     
     const [settings] = await connection.execute(
-      'SELECT player_monthly_rate, guest_daily_rate FROM finance_settings WHERE id = 1'
+      'SELECT player_monthly_rate, player_monthly_year, player_monthly_month, guest_daily_rate FROM finance_settings WHERE id = 1'
     );
 
     if (settings.length === 0) {
-      return res.json({ player_monthly_rate: 0, guest_daily_rate: 0 });
+      return res.json({ 
+        player_monthly_rate: 0, 
+        player_monthly_year: null, 
+        player_monthly_month: null, 
+        guest_daily_rate: 0 
+      });
     }
 
     res.json(settings[0]);
@@ -373,13 +378,13 @@ router.get('/settings', authenticateToken, async (req, res) => {
 router.post('/settings', authenticateToken, authorizeRole('Admin'), async (req, res) => {
   let connection;
   try {
-    const { player_monthly_rate, guest_daily_rate } = req.body;
+    const { player_monthly_rate, player_monthly_year, player_monthly_month, guest_daily_rate } = req.body;
 
     connection = await pool.getConnection();
 
     await connection.execute(
-      'UPDATE finance_settings SET player_monthly_rate = ?, guest_daily_rate = ? WHERE id = 1',
-      [player_monthly_rate || 0, guest_daily_rate || 0]
+      'UPDATE finance_settings SET player_monthly_rate = ?, player_monthly_year = ?, player_monthly_month = ?, guest_daily_rate = ? WHERE id = 1',
+      [player_monthly_rate || 0, player_monthly_year || null, player_monthly_month || null, guest_daily_rate || 0]
     );
 
     res.json({ message: 'Settings updated successfully' });
