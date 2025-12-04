@@ -89,6 +89,21 @@ router.post('/check-in', authenticateToken, async (req, res) => {
         [session_id, guest_name, checked_in_by]
       );
 
+      // Get guest daily rate from settings
+      const [settings] = await connection.execute(
+        'SELECT guest_daily_rate FROM finance_settings WHERE id = 1'
+      );
+
+      const guestDailyRate = settings.length > 0 ? settings[0].guest_daily_rate : 0;
+
+      // Create income record for guest check-in if rate is set
+      if (guestDailyRate > 0) {
+        await connection.execute(
+          'INSERT INTO donations (contributor_id, contributor_name, is_guest, amount, notes, donated_at) VALUES (?, ?, TRUE, ?, ?, NOW())',
+          [null, guest_name, guestDailyRate, `Auto-recorded from guest check-in`]
+        );
+      }
+
       await connection.release();
       res.status(201).json({ message: 'Guest check-in successful', attendance_id: result.insertId });
     }

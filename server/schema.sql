@@ -59,6 +59,18 @@ CREATE TABLE IF NOT EXISTS expenses (
   FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE RESTRICT
 );
 
+-- Finance Settings table
+CREATE TABLE IF NOT EXISTS finance_settings (
+  id INT PRIMARY KEY DEFAULT 1,
+  player_monthly_rate DECIMAL(10, 2) DEFAULT 0,
+  guest_daily_rate DECIMAL(10, 2) DEFAULT 0,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert default finance settings
+INSERT IGNORE INTO finance_settings (id, player_monthly_rate, guest_daily_rate) 
+VALUES (1, 0, 0);
+
 -- Insert default admin user
 INSERT IGNORE INTO users (id, username, password, full_name, role) 
 VALUES (1, 'Admin', '$2a$10$ONjMvl0qAgPrXM5mLKgOoOMhy6M6bR1wCGzJWtoWGJkitdKRESkbC', 'Administrator', 'Admin');

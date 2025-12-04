@@ -244,4 +244,47 @@ router.get('/search', authenticateToken, async (req, res) => {
   }
 });
 
+// Get finance settings
+router.get('/settings', authenticateToken, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    
+    const [settings] = await connection.execute(
+      'SELECT player_monthly_rate, guest_daily_rate FROM finance_settings WHERE id = 1'
+    );
+
+    await connection.release();
+
+    if (settings.length === 0) {
+      return res.json({ player_monthly_rate: 0, guest_daily_rate: 0 });
+    }
+
+    res.json(settings[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
+// Update finance settings (Admin only)
+router.post('/settings', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  try {
+    const { player_monthly_rate, guest_daily_rate } = req.body;
+
+    const connection = await pool.getConnection();
+
+    await connection.execute(
+      'UPDATE finance_settings SET player_monthly_rate = ?, guest_daily_rate = ? WHERE id = 1',
+      [player_monthly_rate || 0, guest_daily_rate || 0]
+    );
+
+    await connection.release();
+
+    res.json({ message: 'Settings updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
 module.exports = router;
