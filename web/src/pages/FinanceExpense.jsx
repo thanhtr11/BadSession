@@ -6,6 +6,7 @@ export default function FinanceExpense({ user }) {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [expenseForm, setExpenseForm] = useState({
     description: '',
     amount: '',
@@ -32,8 +33,13 @@ export default function FinanceExpense({ user }) {
 
   const handleAddExpense = async (e) => {
     e.preventDefault();
+    handleSaveExpense(e);
+  };
+
+  const handleSaveExpense = async (e) => {
+    e.preventDefault();
     if (user?.role !== 'Admin') {
-      alert('Only admins can record expenses');
+      alert('Only admins can modify expense records');
       return;
     }
     try {
@@ -41,17 +47,34 @@ export default function FinanceExpense({ user }) {
         ...expenseForm,
         amount: parseFloat(expenseForm.amount)
       };
-      await apiClient.post('/finance/expenses', payload);
+      
+      if (editingId) {
+        // Update existing record
+        await apiClient.put(`/finance/expenses/${editingId}`, payload);
+        const updatedExpenses = expenses.map(e =>
+          e.id === editingId ? { ...e, ...payload } : e
+        );
+        setExpenses(updatedExpenses);
+        alert('Expense record updated successfully');
+      } else {
+        // Create new record
+        await apiClient.post('/finance/expenses', payload);
+        alert('Expense record created successfully');
+      }
+      
       setShowExpenseModal(false);
+      setEditingId(null);
       setExpenseForm({
         description: '',
         amount: '',
         category: ''
       });
-      fetchExpenses();
+      if (!editingId) {
+        fetchExpenses();
+      }
     } catch (error) {
-      console.error('Failed to record expense:', error);
-      alert('Failed to record expense');
+      console.error('Failed to save expense:', error);
+      alert('Failed to save expense record');
     }
   };
 
@@ -86,6 +109,20 @@ export default function FinanceExpense({ user }) {
       console.error('Failed to delete expense record:', error);
       alert('Failed to delete expense record');
     }
+  };
+
+  const handleEditExpense = (expense) => {
+    if (user?.role !== 'Admin') {
+      alert('Only admins can edit records');
+      return;
+    }
+    setEditingId(expense.id);
+    setExpenseForm({
+      description: expense.description,
+      amount: expense.amount.toString(),
+      category: expense.category
+    });
+    setShowExpenseModal(true);
   };
 
   if (loading) return <div className="loading">Loading Expense Records...</div>;
@@ -137,6 +174,34 @@ export default function FinanceExpense({ user }) {
                 </td>
                 {canEdit && (
                   <td>
+                    <button
+                      onClick={() => handleEditExpense(expense)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        backgroundColor: '#3498db',
+                        color: 'white',
+                        transition: 'all 0.3s ease',
+                        transform: 'scale(1)',
+                        opacity: 1,
+                        marginRight: '4px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'scale(1.05)';
+                        e.target.style.opacity = '0.9';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.opacity = '1';
+                      }}
+                      title="Edit expense record"
+                    >
+                      ✏️ Edit
+                    </button>
                     <button
                       onClick={() => handleMarkAsPaid(expense.id, expense.is_paid)}
                       style={{
@@ -203,7 +268,7 @@ export default function FinanceExpense({ user }) {
       {showExpenseModal && (
         <div className="modal-overlay" onClick={() => setShowExpenseModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">Record Expense</div>
+            <div className="modal-header">{editingId ? '✏️ Edit Expense Record' : '➕ Record Expense'}</div>
             <form onSubmit={handleAddExpense}>
               <div className="form-group">
                 <label className="form-label">Description</label>
@@ -245,11 +310,19 @@ export default function FinanceExpense({ user }) {
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="button btn-secondary" onClick={() => setShowExpenseModal(false)}>
+                <button type="button" className="button btn-secondary" onClick={() => {
+                  setShowExpenseModal(false);
+                  setEditingId(null);
+                  setExpenseForm({
+                    description: '',
+                    amount: '',
+                    category: ''
+                  });
+                }}>
                   Cancel
                 </button>
                 <button type="submit" className="button btn-danger">
-                  Record Expense
+                  {editingId ? 'Update Expense' : 'Record Expense'}
                 </button>
               </div>
             </form>

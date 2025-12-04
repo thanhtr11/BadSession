@@ -575,4 +575,101 @@ router.delete('/expenses/:id', authenticateToken, authorizeRole('Admin'), async 
   }
 });
 
+// Update income record (Admin only)
+router.put('/income/:id', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
+  try {
+    const { id } = req.params;
+    const { amount, notes, contributor_id, contributor_name, is_guest } = req.body;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ error: 'Amount must be greater than 0' });
+    }
+
+    connection = await pool.getConnection();
+
+    // Update the donation record
+    const [result] = await connection.execute(
+      `UPDATE donations SET 
+        amount = ?,
+        notes = ?,
+        contributor_id = ?,
+        contributor_name = ?
+      WHERE id = ?`,
+      [amount, notes || '', contributor_id || null, contributor_name || '', id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Income record not found' });
+    }
+
+    res.json({ 
+      message: 'Income record updated successfully',
+      id,
+      amount,
+      notes,
+      contributor_id,
+      contributor_name
+    });
+  } catch (error) {
+    console.error('Error updating income record:', error);
+    res.status(500).json({ error: 'Failed to update income record' });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Update expense record (Admin only)
+router.put('/expenses/:id', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
+  try {
+    const { id } = req.params;
+    const { amount, description, category, notes } = req.body;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ error: 'Amount must be greater than 0' });
+    }
+
+    if (!description || description.trim() === '') {
+      return res.status(400).json({ error: 'Description is required' });
+    }
+
+    if (!category || category.trim() === '') {
+      return res.status(400).json({ error: 'Category is required' });
+    }
+
+    connection = await pool.getConnection();
+
+    // Update the expense record
+    const [result] = await connection.execute(
+      `UPDATE expenses SET 
+        amount = ?,
+        description = ?,
+        category = ?,
+        notes = ?
+      WHERE id = ?`,
+      [amount, description, category, notes || '', id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Expense record not found' });
+    }
+
+    res.json({ 
+      message: 'Expense record updated successfully',
+      id,
+      amount,
+      description,
+      category,
+      notes
+    });
+  } catch (error) {
+    console.error('Error updating expense record:', error);
+    res.status(500).json({ error: 'Failed to update expense record' });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
 module.exports = router;
+

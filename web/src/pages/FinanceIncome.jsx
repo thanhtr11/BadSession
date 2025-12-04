@@ -6,6 +6,7 @@ export default function FinanceIncome({ user }) {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDonationModal, setShowDonationModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [donationForm, setDonationForm] = useState({
     contributor_name: '',
     is_guest: false,
@@ -70,31 +71,7 @@ export default function FinanceIncome({ user }) {
 
   const handleAddDonation = async (e) => {
     e.preventDefault();
-    if (user?.role !== 'Admin') {
-      alert('Only admins can record income');
-      return;
-    }
-    try {
-      const payload = {
-        ...donationForm,
-        amount: parseFloat(donationForm.amount),
-        contributor_id: donationForm.is_guest ? null : parseInt(donationForm.contributor_id),
-        contributor_name: donationForm.is_guest ? donationForm.contributor_name : ''
-      };
-      await apiClient.post('/finance/income', payload);
-      setShowDonationModal(false);
-      setDonationForm({
-        contributor_name: '',
-        is_guest: false,
-        contributor_id: '',
-        amount: '',
-        notes: ''
-      });
-      fetchIncome();
-    } catch (error) {
-      console.error('Failed to record income:', error);
-      alert('Failed to record income');
-    }
+    handleSaveDonation(e);
   };
 
   const handleMarkAsPaid = async (donationId) => {
@@ -132,6 +109,76 @@ export default function FinanceIncome({ user }) {
     } catch (error) {
       console.error('Failed to delete income record:', error);
       alert('Failed to delete income record');
+    }
+  };
+
+  const handleEditIncome = (donation) => {
+    if (user?.role !== 'Admin') {
+      alert('Only admins can edit records');
+      return;
+    }
+    setEditingId(donation.id);
+    setDonationForm({
+      contributor_name: donation.contributor_name || donation.contributor_full_name || '',
+      is_guest: !donation.contributor_id,
+      contributor_id: donation.contributor_id || '',
+      amount: donation.amount.toString(),
+      notes: donation.notes || ''
+    });
+    setSearchQuery(donation.contributor_name || donation.contributor_full_name || '');
+    setShowDonationModal(true);
+  };
+
+  const handleSaveDonation = async (e) => {
+    e.preventDefault();
+    if (user?.role !== 'Admin') {
+      alert('Only admins can modify income records');
+      return;
+    }
+    try {
+      const payload = {
+        ...donationForm,
+        amount: parseFloat(donationForm.amount),
+        contributor_id: donationForm.is_guest ? null : parseInt(donationForm.contributor_id),
+        contributor_name: donationForm.is_guest ? donationForm.contributor_name : ''
+      };
+      
+      if (editingId) {
+        // Update existing record
+        await apiClient.put(`/finance/income/${editingId}`, payload);
+        const updatedDonations = donations.map(d =>
+          d.id === editingId
+            ? {
+                ...d,
+                ...payload,
+                contributor_full_name: payload.contributor_id ? d.contributor_full_name : payload.contributor_name
+              }
+            : d
+        );
+        setDonations(updatedDonations);
+        alert('Income record updated successfully');
+      } else {
+        // Create new record
+        await apiClient.post('/finance/income', payload);
+        alert('Income record created successfully');
+      }
+      
+      setShowDonationModal(false);
+      setEditingId(null);
+      setDonationForm({
+        contributor_name: '',
+        is_guest: false,
+        contributor_id: '',
+        amount: '',
+        notes: ''
+      });
+      setSearchQuery('');
+      if (!editingId) {
+        fetchIncome();
+      }
+    } catch (error) {
+      console.error('Failed to save income:', error);
+      alert('Failed to save income record');
     }
   };
 
@@ -181,6 +228,32 @@ export default function FinanceIncome({ user }) {
                 <td>{donation.notes || '-'}</td>
                 {canEdit && (
                   <td>
+                    <button
+                      onClick={() => handleEditIncome(donation)}
+                      style={{
+                        padding: '6px 16px',
+                        fontSize: '12px',
+                        margin: '0 4px 0 0',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        backgroundColor: '#3498db',
+                        color: 'white'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.opacity = '0.9';
+                        e.target.style.transform = 'scale(1.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.opacity = '1';
+                        e.target.style.transform = 'scale(1)';
+                      }}
+                      title="Edit income record"
+                    >
+                      ✏️ Edit
+                    </button>
                     <button
                       onClick={() => handleMarkAsPaid(donation.id)}
                       style={{
@@ -244,7 +317,7 @@ export default function FinanceIncome({ user }) {
       {showDonationModal && (
         <div className="modal-overlay" onClick={() => setShowDonationModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">Record Income</div>
+            <div className="modal-header">{editingId ? '✏️ Edit Income Record' : '➕ Record Income'}</div>
             <form onSubmit={handleAddDonation}>
               <div className="form-group">
                 <label className="form-label">Contributor Type</label>
@@ -382,11 +455,22 @@ export default function FinanceIncome({ user }) {
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="button btn-secondary" onClick={() => setShowDonationModal(false)}>
+                <button type="button" className="button btn-secondary" onClick={() => {
+                  setShowDonationModal(false);
+                  setEditingId(null);
+                  setDonationForm({
+                    contributor_name: '',
+                    is_guest: false,
+                    contributor_id: '',
+                    amount: '',
+                    notes: ''
+                  });
+                  setSearchQuery('');
+                }}>
                   Cancel
                 </button>
                 <button type="submit" className="button btn-success">
-                  Record Income
+                  {editingId ? 'Update Income' : 'Record Income'}
                 </button>
               </div>
             </form>
