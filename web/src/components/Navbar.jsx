@@ -39,7 +39,9 @@ export default function Navbar({ user, onLogout }) {
         <div className="user-role">{user?.role}</div>
       </div>
 
-      <ul className={`nav-menu ${menuOpen ? 'open' : ''}`}>
+  {menuOpen && <div className="mobile-backdrop" onClick={() => setMenuOpen(false)} />}
+
+  <ul className={`nav-menu ${menuOpen ? 'open' : ''}`}>
         <li className="nav-item">
           <a className={`nav-link ${isActive('/')}`} onClick={() => handleNav('/')}>📊 Dashboard</a>
         </li>
@@ -61,8 +63,6 @@ export default function Navbar({ user, onLogout }) {
           </li>
         )}
       </ul>
-  {menuOpen && <div className="mobile-backdrop" onClick={() => setMenuOpen(false)} />}
-
   <button className="logout-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>🚪 Logout</button>
     </nav>
   );

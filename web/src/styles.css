@@ -475,6 +475,19 @@ tr:hover {
     display: block;
   }
 
+  /* stacking order fixes */
+  .hamburger {
+    z-index: 1002;
+  }
+
+  .nav-menu.open {
+    z-index: 1001;
+  }
+
+  .mobile-backdrop {
+    z-index: 1000;
+  }
+
   .user-info {
     display: none;
   }
