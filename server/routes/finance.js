@@ -454,4 +454,73 @@ router.post('/settings', authenticateToken, authorizeRole('Admin'), async (req, 
   }
 });
 
+// Apply player monthly income rate to specific players (Admin only)
+router.post('/apply-player-income', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
+  try {
+    const { player_ids, amount, year, month } = req.body;
+
+    if (!player_ids || player_ids.length === 0 || !amount || !year || !month) {
+      return res.status(400).json({ error: 'Missing required fields: player_ids, amount, year, month' });
+    }
+
+    connection = await pool.getConnection();
+
+    console.log(`Applying income rate ${amount} to ${player_ids.length} players for ${year}-${month}`);
+
+    // Check if income records already exist for this period and these players
+    const placeholders = player_ids.map(() => '?').join(',');
+    const [existingRecords] = await connection.execute(
+      `SELECT COUNT(*) as count FROM donations d
+       WHERE d.is_guest = FALSE 
+       AND d.contributor_id IN (${placeholders})
+       AND YEAR(d.donated_at) = ? 
+       AND MONTH(d.donated_at) = ? 
+       AND d.amount = ?`,
+      [...player_ids, year, month, amount]
+    );
+
+    let createdCount = 0;
+
+    if (existingRecords[0].count === 0) {
+      // Get player names for the income records
+      const [players] = await connection.execute(
+        `SELECT id, full_name FROM users WHERE id IN (${placeholders})`,
+        player_ids
+      );
+
+      // Create income record for each selected player for this month
+      for (const player of players) {
+        await connection.execute(
+          `INSERT INTO donations (contributor_id, contributor_name, is_guest, amount, notes, donated_at) 
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            player.id,
+            null,
+            false,
+            amount,
+            `Monthly income for ${year}-${String(month).padStart(2, '0')}`,
+            new Date(`${year}-${String(month).padStart(2, '0')}-01`)
+          ]
+        );
+        createdCount++;
+      }
+      console.log(`Created ${createdCount} income records`);
+    } else {
+      console.log('Some or all income records already exist for this period');
+    }
+
+    res.json({ 
+      message: createdCount > 0 
+        ? `Successfully created ${createdCount} income record(s)` 
+        : 'Income records already exist for this period'
+    });
+  } catch (error) {
+    console.error('Error applying player income:', error);
+    res.status(500).json({ error: 'Failed to apply player income rate', details: error.message });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
 module.exports = router;
