@@ -83,7 +83,8 @@ router.get('/:id', authenticateToken, async (req, res) => {
     const [attendance] = await connection.execute(
       `SELECT a.id, a.user_id, a.guest_name, a.is_guest, a.check_in_time, a.checked_in_by,
               COALESCE(u.full_name, a.guest_name) as name,
-              checked_in_player.full_name as checked_in_by_name
+              checked_in_player.full_name as checked_in_by_name,
+              DATE_FORMAT(a.check_in_time, '%Y-%m-%d %H:%i:%s') as formatted_check_in_time
        FROM attendance a
        LEFT JOIN users u ON a.user_id = u.id
        LEFT JOIN users checked_in_player ON a.checked_in_by = checked_in_player.id
