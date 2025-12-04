@@ -4,6 +4,9 @@ import { formatVND } from '../utils/format';
 
 export default function Guests() {
   const [guests, setGuests] = useState([]);
+  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [guestDetails, setGuestDetails] = useState({ donations: [], sessions: [] });
+  const [detailsLoading, setDetailsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,6 +60,32 @@ export default function Guests() {
     }
   };
 
+  const openGuestModal = async (guestName) => {
+    setSelectedGuest(guestName);
+    setDetailsLoading(true);
+    try {
+      // fetch donations for this guest from existing donations endpoint and filter
+      const donationsRes = await apiClient.get('/finance/donations');
+      const guestDonations = (donationsRes.data || []).filter(d => d.is_guest && (d.contributor_name === guestName));
+
+      // fetch session history for this guest
+      const sessionsRes = await apiClient.get(`/attendance/guest/${encodeURIComponent(guestName)}/history`);
+
+      setGuestDetails({ donations: guestDonations, sessions: sessionsRes.data || [] });
+    } catch (err) {
+      console.error('Failed to load guest details', err);
+      setGuestDetails({ donations: [], sessions: [] });
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const closeGuestModal = () => {
+    setSelectedGuest(null);
+    setGuestDetails({ donations: [], sessions: [] });
+    setDetailsLoading(false);
+  };
+
   if (loading) return <div className="loading">Loading Guests...</div>;
 
   return (
@@ -90,16 +119,85 @@ export default function Guests() {
             </thead>
             <tbody>
               {guests.map((guest, idx) => (
-                <tr key={idx}>
+                <tr key={idx} onClick={() => openGuestModal(guest.name)} style={{ cursor: 'pointer' }}>
                   <td>{guest.name}</td>
                   <td>{guest.sessions}</td>
-                    <td>{formatVND(guest.donations)}</td>
+                  <td>{formatVND(guest.donations)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Guest Details Modal */}
+      {selectedGuest && (
+        <div className="modal-overlay" onClick={() => closeGuestModal()}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+            <div className="modal-header">Guest: {selectedGuest}</div>
+            <div className="modal-body">
+              {detailsLoading ? (
+                <div className="loading">Loading details...</div>
+              ) : (
+                <div>
+                  <div style={{ marginBottom: '12px' }}>
+                    <strong>Total Guest Income: </strong>{formatVND(guestDetails.donations.reduce((s, d) => s + parseFloat(d.amount), 0))}
+                  </div>
+
+                  <h3>Donation History</h3>
+                  <div className="table-wrapper">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Amount</th>
+                          <th>Date</th>
+                          <th>Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {guestDetails.donations.map((d) => (
+                          <tr key={d.id}>
+                            <td>{formatVND(d.amount)}</td>
+                            <td>{new Date(d.donated_at).toLocaleString()}</td>
+                            <td>{d.notes || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <h3 style={{ marginTop: '16px' }}>Session History</h3>
+                  <div className="table-wrapper">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Session ID</th>
+                          <th>Date</th>
+                          <th>Time</th>
+                          <th>Location</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {guestDetails.sessions.map((s) => (
+                          <tr key={s.id}>
+                            <td>{s.session_id}</td>
+                            <td>{s.session_date}</td>
+                            <td>{s.session_time}</td>
+                            <td>{s.location}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="button btn-secondary" onClick={() => closeGuestModal()}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
