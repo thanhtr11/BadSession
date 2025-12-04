@@ -92,7 +92,7 @@ export default function FinanceExpense({ user }) {
               <th>Recorded By</th>
               <th>Date</th>
               <th>Status</th>
-              <th>Action</th>
+              {canEdit && <th>Action</th>}
             </tr>
           </thead>
           <tbody>
@@ -116,8 +116,8 @@ export default function FinanceExpense({ user }) {
                     {expense.is_paid ? '✓ Paid' : '⏳ Pending'}
                   </span>
                 </td>
-                <td>
-                  {canEdit && (
+                {canEdit && (
+                  <td>
                     <button
                       onClick={() => handleMarkAsPaid(expense.id, expense.is_paid)}
                       style={{
@@ -144,8 +144,8 @@ export default function FinanceExpense({ user }) {
                     >
                       {expense.is_paid ? '✓ Paid' : '💰 Pay'}
                     </button>
-                  )}
-                </td>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
