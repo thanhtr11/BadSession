@@ -85,8 +85,8 @@ export default function Sessions() {
   };
 
   const handleEditAttendance = (attendance) => {
-    setEditingAttendance(attendance);
-    setEditGuestName(attendance.guest_name || '');
+  setEditingAttendance(attendance);
+  setEditGuestName(attendance.guest_name || attendance.name || '');
     setEditModal(true);
   };
 
@@ -266,7 +266,7 @@ export default function Sessions() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
                           <div style={{ flex: 1 }}>
                             <p style={{ margin: '0', fontWeight: 'bold', color: '#2c3e50' }}>
-                              {att.is_guest ? '🧑' : '🎾'} {att.name}
+                              {att.is_guest ? '🧑' : '🎾'} {att.guest_name || att.name}
                               {att.is_guest && att.checked_in_by_name && (
                                 <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#666', marginLeft: '5px' }}>({att.checked_in_by_name})</span>
                               )}
