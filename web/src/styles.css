@@ -220,6 +220,58 @@ html {
   color: white;
 }
 
+/* Calendar Link Highlight */
+.calendar-item {
+  position: relative;
+  margin-bottom: 15px !important;
+}
+
+.calendar-link {
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.15) 0%, rgba(23, 162, 184, 0.05) 100%);
+  border-left: 3px solid var(--primary-teal);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-link:hover {
+  background: var(--primary-teal);
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+}
+
+.calendar-link.active {
+  background: var(--primary-teal);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+}
+
+.calendar-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #f39c12, #e74c3c);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-left: auto;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.navbar.collapsed .calendar-badge {
+  display: none;
+}
+
 .logout-btn {
   width: 100%;
   padding: 12px;
