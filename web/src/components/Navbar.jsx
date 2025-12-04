@@ -1,13 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Navbar({ user, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const userMenuRef = useRef(null);
 
   const isActive = (path) => (location.pathname === path ? 'active' : '');
+
+  // Close dropdown when navigating
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [location.pathname]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [userMenuOpen]);
 
   const handleLogout = () => {
     onLogout();
@@ -49,9 +72,32 @@ export default function Navbar({ user, onLogout }) {
         </button>
       </div>
 
-      <div className="user-info">
-        <div className="user-name">{user?.full_name}</div>
-        <div className="user-role">{user?.role}</div>
+      <div className="user-menu">
+        <button 
+          className="user-menu-trigger"
+          onClick={() => setUserMenuOpen(!userMenuOpen)}
+        >
+          <div className="user-info-display">
+            <div className="user-name">{user?.full_name}</div>
+            <div className="user-role">{user?.role}</div>
+          </div>
+          <span className="user-menu-icon">▼</span>
+        </button>
+        
+        {userMenuOpen && (
+          <div className="user-dropdown" ref={userMenuRef}>
+            <button 
+              className="logout-btn-dropdown"
+              onClick={() => {
+                handleLogout();
+                setUserMenuOpen(false);
+              }}
+            >
+              <span className="logout-icon">🚪</span>
+              <span className="logout-label">Logout</span>
+            </button>
+          </div>
+        )}
       </div>
 
   {menuOpen && <div className="mobile-backdrop show" onClick={() => setMenuOpen(false)} />}
@@ -103,10 +149,6 @@ export default function Navbar({ user, onLogout }) {
           </li>
         )}
       </ul>
-  <button className="logout-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>
-    <span className="logout-icon">🚪</span>
-    <span className="logout-label">Logout</span>
-  </button>
     </nav>
   );
 }
