@@ -56,8 +56,9 @@ router.post('/expenses', authenticateToken, authorizeRole('Admin'), async (req, 
 
 // Get all donations
 router.get('/donations', authenticateToken, async (req, res) => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [donations] = await connection.execute(
       `SELECT d.id, d.contributor_id, d.contributor_name, d.is_guest, d.amount, d.notes, d.is_paid, d.donated_at,
@@ -67,18 +68,20 @@ router.get('/donations', authenticateToken, async (req, res) => {
        ORDER BY d.donated_at DESC`
     );
 
-    await connection.release();
     res.json(donations);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching donations:', error);
     res.status(500).json({ error: 'Failed to retrieve donations' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
 // Get all expenses
 router.get('/expenses', authenticateToken, async (req, res) => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [expenses] = await connection.execute(
       `SELECT e.id, e.description, e.amount, e.category, e.recorded_by, u.full_name, e.recorded_at, e.is_paid
@@ -87,18 +90,20 @@ router.get('/expenses', authenticateToken, async (req, res) => {
        ORDER BY e.recorded_at DESC`
     );
 
-    await connection.release();
     res.json(expenses);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching expenses:', error);
     res.status(500).json({ error: 'Failed to retrieve expenses' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
 // Get financial summary
 router.get('/summary', authenticateToken, async (req, res) => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     // Total paid donations
     const [donationData] = await connection.execute(
@@ -120,8 +125,6 @@ router.get('/summary', authenticateToken, async (req, res) => {
       'SELECT COALESCE(SUM(amount), 0) as total_30_days FROM expenses WHERE is_paid = TRUE AND recorded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)'
     );
 
-    await connection.release();
-
     const totalDonations = parseFloat(donationData[0].total_donations);
     const totalExpenses = parseFloat(expenseData[0].total_expenses);
 
@@ -133,8 +136,10 @@ router.get('/summary', authenticateToken, async (req, res) => {
       expenses_30_days: parseFloat(last30Expenses[0].total_30_days)
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching summary:', error);
     res.status(500).json({ error: 'Failed to retrieve financial summary' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
@@ -189,8 +194,9 @@ router.post('/income', authenticateToken, authorizeRole('Admin'), async (req, re
 });
 
 router.get('/income', authenticateToken, async (req, res) => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [income] = await connection.execute(
       `SELECT d.id, d.contributor_id, d.contributor_name, d.is_guest, d.amount, d.notes, d.is_paid, d.donated_at,
@@ -200,11 +206,12 @@ router.get('/income', authenticateToken, async (req, res) => {
        ORDER BY d.donated_at DESC`
     );
 
-    await connection.release();
     res.json(income);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching income:', error);
     res.status(500).json({ error: 'Failed to retrieve income' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
@@ -341,14 +348,13 @@ router.post('/expenses/:id/toggle-paid', authenticateToken, authorizeRole('Admin
 
 // Get finance settings
 router.get('/settings', authenticateToken, async (req, res) => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     
     const [settings] = await connection.execute(
       'SELECT player_monthly_rate, guest_daily_rate FROM finance_settings WHERE id = 1'
     );
-
-    await connection.release();
 
     if (settings.length === 0) {
       return res.json({ player_monthly_rate: 0, guest_daily_rate: 0 });
@@ -356,29 +362,32 @@ router.get('/settings', authenticateToken, async (req, res) => {
 
     res.json(settings[0]);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching settings:', error);
     res.status(500).json({ error: 'Failed to fetch settings' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
 // Update finance settings (Admin only)
 router.post('/settings', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
   try {
     const { player_monthly_rate, guest_daily_rate } = req.body;
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     await connection.execute(
       'UPDATE finance_settings SET player_monthly_rate = ?, guest_daily_rate = ? WHERE id = 1',
       [player_monthly_rate || 0, guest_daily_rate || 0]
     );
 
-    await connection.release();
-
     res.json({ message: 'Settings updated successfully' });
   } catch (error) {
-    console.error(error);
+    console.error('Error updating settings:', error);
     res.status(500).json({ error: 'Failed to update settings' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
