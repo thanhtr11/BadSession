@@ -1,7 +1,7 @@
 {
   "name": "badsession-server",
-  "version": "1.0.0",
-  "description": "Badminton Session Management API",
+  "version": "2.0.0",
+  "description": "Badminton Session Management API with Match Tracking",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

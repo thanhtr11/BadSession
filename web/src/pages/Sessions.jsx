@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
+import MatchManager from '../components/MatchManager';
 
 export default function Sessions() {
   const [sessions, setSessions] = useState([]);
@@ -304,6 +305,11 @@ export default function Sessions() {
                   No one has checked in yet
                 </div>
               )}
+
+              {/* Match Manager Component */}
+              <div style={{ marginTop: '25px', borderTop: '2px solid #17a2b8', paddingTop: '20px' }}>
+                <MatchManager sessionId={selectedSession.id} sessionDetails={sessionDetails} />
+              </div>
             </div>
 
             <div className="modal-footer">
