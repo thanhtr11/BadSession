@@ -99,7 +99,7 @@ export default function Players() {
                   <strong>Username:</strong> {selectedPlayer.username}
                 </div>
                 <div style={{ marginBottom: '10px' }}>
-                  <strong>Total Income:</strong> ${Number(playerDetails.total_donations || 0).toFixed(2)}
+                  <strong>Total Income:</strong> VND {Number(playerDetails.total_donations || 0).toFixed(2)}
                 </div>
                 <div>
                   <strong>Sessions Attended:</strong> {playerDetails.attendance.length}
@@ -146,7 +146,7 @@ export default function Players() {
                     <tbody>
                       {playerDetails.donations.map(donation => (
                         <tr key={donation.id}>
-                          <td>${Number(donation.amount || 0).toFixed(2)}</td>
+                          <td>VND {Number(donation.amount || 0).toFixed(2)}</td>
                           <td>{new Date(donation.donated_at).toLocaleDateString()}</td>
                           <td>{donation.notes || '-'}</td>
                         </tr>

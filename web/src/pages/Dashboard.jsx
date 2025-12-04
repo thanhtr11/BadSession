@@ -38,21 +38,21 @@ export default function Dashboard() {
         </div>
         <div className="stat-card">
           <div className="stat-label">Total Income</div>
-          <div className="stat-value">${dashboard?.total_donations?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">VND {dashboard?.total_donations?.toFixed(2) || '0.00'}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Remaining Fund</div>
           <div className="stat-value" style={{ color: dashboard?.remaining_fund >= 0 ? '#27ae60' : '#e74c3c' }}>
-            ${dashboard?.remaining_fund?.toFixed(2) || '0.00'}
+            VND {dashboard?.remaining_fund?.toFixed(2) || '0.00'}
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Income (30 days)</div>
-          <div className="stat-value">${dashboard?.donations_30_days?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">VND {dashboard?.donations_30_days?.toFixed(2) || '0.00'}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Expenses (30 days)</div>
-          <div className="stat-value">${dashboard?.expenses_30_days?.toFixed(2) || '0.00'}</div>
+          <div className="stat-value">VND {dashboard?.expenses_30_days?.toFixed(2) || '0.00'}</div>
         </div>
       </div>
 
@@ -98,7 +98,7 @@ export default function Dashboard() {
               {dashboard?.recent_donations?.map(donation => (
                 <tr key={donation.id}>
                   <td>{donation.contributor_full_name || 'Anonymous'}</td>
-                  <td>${parseFloat(donation.amount).toFixed(2)}</td>
+                  <td>VND {parseFloat(donation.amount).toFixed(2)}</td>
                   <td>{new Date(donation.donated_at).toLocaleDateString()}</td>
                 </tr>
               ))}
@@ -123,7 +123,7 @@ export default function Dashboard() {
               {dashboard?.recent_expenses?.map(expense => (
                 <tr key={expense.id}>
                   <td>{expense.description}</td>
-                  <td>${parseFloat(expense.amount).toFixed(2)}</td>
+                  <td>VND {parseFloat(expense.amount).toFixed(2)}</td>
                   <td>{expense.category || 'N/A'}</td>
                   <td>{new Date(expense.recorded_at).toLocaleDateString()}</td>
                 </tr>
