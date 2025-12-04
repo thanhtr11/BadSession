@@ -64,13 +64,37 @@ export default function Finance({ user }) {
     }
   };
 
+  // When typing guest name, keep the typed value in donationForm.contributor_name
+  const handleSearchContributorWithSync = async (query) => {
+    setSearchQuery(query);
+    if (donationForm.is_guest) {
+      setDonationForm({ ...donationForm, contributor_name: query });
+    }
+    if (query.length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+    try {
+      const type = donationForm.is_guest ? 'guest' : 'player';
+      const res = await apiClient.get(`/finance/search?type=${type}&query=${encodeURIComponent(query)}`);
+      setSearchResults(res.data);
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('Failed to search:', error);
+      setSearchResults([]);
+    }
+  };
+
   const handleSelectContributor = (contributor) => {
     if (donationForm.is_guest) {
-      setDonationForm({ ...donationForm, contributor_name: contributor.full_name || contributor.name });
+      const name = contributor.full_name || contributor.name;
+      setDonationForm({ ...donationForm, contributor_name: name });
+      setSearchQuery(name);
     } else {
       setDonationForm({ ...donationForm, contributor_id: contributor.id, contributor_name: contributor.full_name });
+      setSearchQuery(contributor.full_name);
     }
-    setSearchQuery('');
     setSearchResults([]);
     setShowSearchResults(false);
   };
@@ -245,7 +269,7 @@ export default function Finance({ user }) {
                 <select
                   className="form-select"
                   value={donationForm.is_guest ? 'guest' : 'player'}
-                  onChange={e => setDonationForm({ ...donationForm, is_guest: e.target.value === 'guest' })}
+                  onChange={e => setDonationForm({ ...donationForm, is_guest: e.target.value === 'guest', contributor_id: '', contributor_name: '' })}
                 >
                   <option value="player">Player</option>
                   <option value="guest">Guest</option>
@@ -259,8 +283,8 @@ export default function Finance({ user }) {
                     type="text"
                     className="form-input"
                     placeholder="Search guest name..."
-                    value={searchQuery}
-                    onChange={(e) => handleSearchContributor(e.target.value)}
+                    value={donationForm.contributor_name}
+                    onChange={(e) => handleSearchContributorWithSync(e.target.value)}
                     onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
                     required
                   />
