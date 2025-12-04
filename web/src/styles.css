@@ -474,4 +474,57 @@ tr:hover {
   .form-card {
     padding: 20px;
   }
+
+  /* Mobile improvements */
+  .table-wrapper {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  table th, table td {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+
+  /* Make buttons easier to tap on small screens */
+  .button {
+    padding: 14px 18px;
+    font-size: 16px;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  /* Modal becomes nearly full-screen on small devices */
+  .modal {
+    width: 98%;
+    max-width: none;
+    height: 90vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-footer .button {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  /* Improve table readability by increasing row spacing */
+  tr:hover {
+    background: #fcfdfe;
+  }
+
+  /* Make clickable table rows easier to tap */
+  tbody tr {
+    touch-action: manipulation;
+  }
 }
