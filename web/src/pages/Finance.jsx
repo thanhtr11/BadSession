@@ -79,25 +79,27 @@ export default function Finance({ user }) {
         >
           💳 Expenses
         </Link>
-        <Link
-          to="/finance/setting"
-          style={{
-            padding: '12px 20px',
-            border: 'none',
-            backgroundColor: isActive('/finance/setting') ? '#17a2b8' : 'transparent',
-            color: isActive('/finance/setting') ? 'white' : '#7f8c8d',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: isActive('/finance/setting') ? 'bold' : 'normal',
-            borderBottom: isActive('/finance/setting') ? '3px solid #17a2b8' : 'none',
-            marginBottom: '-2px',
-            transition: 'all 0.2s',
-            textDecoration: 'none',
-            display: 'inline-block'
-          }}
-        >
-          ⚙️ Settings
-        </Link>
+        {user?.role === 'Admin' && (
+          <Link
+            to="/finance/setting"
+            style={{
+              padding: '12px 20px',
+              border: 'none',
+              backgroundColor: isActive('/finance/setting') ? '#17a2b8' : 'transparent',
+              color: isActive('/finance/setting') ? 'white' : '#7f8c8d',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: isActive('/finance/setting') ? 'bold' : 'normal',
+              borderBottom: isActive('/finance/setting') ? '3px solid #17a2b8' : 'none',
+              marginBottom: '-2px',
+              transition: 'all 0.2s',
+              textDecoration: 'none',
+              display: 'inline-block'
+            }}
+          >
+            ⚙️ Settings
+          </Link>
+        )}
       </div>
 
       {/* Sub-page Content */}

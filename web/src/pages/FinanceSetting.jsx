@@ -62,6 +62,20 @@ export default function FinanceSetting({ user }) {
     return <div className="loading">Loading Settings...</div>;
   }
 
+  if (!canEdit) {
+    return (
+      <div style={{
+        padding: '20px',
+        backgroundColor: '#f8d7da',
+        color: '#721c24',
+        borderRadius: '4px',
+        border: '1px solid #f5c6cb'
+      }}>
+        ⛔ Access Denied: Only administrators can access finance settings.
+      </div>
+    );
+  }
+
   return (
     <div>
       <h2 className="section-title">⚙️ Finance Settings</h2>
