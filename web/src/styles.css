@@ -17,6 +17,10 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f5f7fa;
@@ -24,21 +28,26 @@ body {
   height: 100vh;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
-html {
+html, body, #root {
   height: 100%;
+  width: 100%;
 }
 
 .app-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100%;
 }
 
 .main-content {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+  height: 100vh;
+  max-height: 100vh;
 }
 
 /* Navbar */
@@ -47,11 +56,12 @@ html {
   background: linear-gradient(135deg, var(--charcoal) 0%, #34495e 100%);
   padding: 20px;
   color: white;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   transition: width 0.3s ease, padding 0.3s ease;
   position: relative;
+  flex-shrink: 0;
 }
 
 .navbar.collapsed {
