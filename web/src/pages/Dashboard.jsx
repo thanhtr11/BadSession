@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../api';
 import { formatVND } from '../utils/format';
 
 export default function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboard();
@@ -29,29 +31,29 @@ export default function Dashboard() {
 
       {/* Key Stats */}
       <div className="stats-grid">
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/players')} style={{ cursor: 'pointer' }}>
           <div className="stat-label">Players</div>
           <div className="stat-value">{dashboard?.player_count || 0}</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/guests')} style={{ cursor: 'pointer' }}>
           <div className="stat-label">Guests</div>
           <div className="stat-value">{dashboard?.guest_count || 0}</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/finance')} style={{ cursor: 'pointer' }}>
           <div className="stat-label">Total Income</div>
           <div className="stat-value">{formatVND(dashboard?.total_donations)}</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/finance')} style={{ cursor: 'pointer' }}>
           <div className="stat-label">Remaining Fund</div>
           <div className="stat-value" style={{ color: dashboard?.remaining_fund >= 0 ? '#27ae60' : '#e74c3c' }}>
             {formatVND(dashboard?.remaining_fund)}
           </div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/finance')} style={{ cursor: 'pointer' }}>
           <div className="stat-label">Income (30 days)</div>
           <div className="stat-value">{formatVND(dashboard?.donations_30_days)}</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/finance')} style={{ cursor: 'pointer' }}>
           <div className="stat-label">Expenses (30 days)</div>
           <div className="stat-value">{formatVND(dashboard?.expenses_30_days)}</div>
         </div>
