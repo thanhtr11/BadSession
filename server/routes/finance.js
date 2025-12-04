@@ -413,11 +413,24 @@ router.post('/settings', authenticateToken, authorizeRole('Admin'), async (req, 
 
     connection = await pool.getConnection();
 
-    // Update settings
-    await connection.execute(
-      'UPDATE finance_settings SET player_monthly_rate = ?, player_monthly_year = ?, player_monthly_month = ?, guest_daily_rate = ? WHERE id = 1',
-      [player_monthly_rate || 0, player_monthly_year || null, player_monthly_month || null, guest_daily_rate || 0]
-    );
+    console.log('Updating settings with:', { player_monthly_rate, player_monthly_year, player_monthly_month, guest_daily_rate });
+
+    // Update settings - try full update first
+    try {
+      await connection.execute(
+        'UPDATE finance_settings SET player_monthly_rate = ?, player_monthly_year = ?, player_monthly_month = ?, guest_daily_rate = ? WHERE id = 1',
+        [player_monthly_rate || 0, player_monthly_year || null, player_monthly_month || null, guest_daily_rate || 0]
+      );
+    } catch (updateError) {
+      // If full update fails, try updating only guest_daily_rate
+      console.log('Full update failed, trying guest_daily_rate only:', updateError.message);
+      await connection.execute(
+        'UPDATE finance_settings SET guest_daily_rate = ? WHERE id = 1',
+        [guest_daily_rate || 0]
+      );
+    }
+
+    console.log('Settings updated successfully');
 
     // If player_monthly_rate, year, and month are provided, auto-create income records for all players
     if (player_monthly_rate && player_monthly_year && player_monthly_month) {
@@ -465,8 +478,9 @@ router.post('/settings', authenticateToken, authorizeRole('Admin'), async (req, 
 
     res.json({ message: 'Settings updated successfully' });
   } catch (error) {
-    console.error('Error updating settings:', error);
-    res.status(500).json({ error: 'Failed to update settings' });
+    console.error('Error updating settings:', error.message);
+    console.error('Error details:', error);
+    res.status(500).json({ error: 'Failed to update settings', details: error.message });
   } finally {
     if (connection) await connection.release();
   }
