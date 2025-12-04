@@ -208,13 +208,13 @@ export default function Finance({ user }) {
       <div className="section">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 className="section-title">💸 Income</h2>
-          {donations.length > 5 && (
+          {donations && donations.length > 5 && (
             <button 
               className="btn btn-secondary"
               onClick={() => setShowAllDonations(true)}
-              style={{ marginTop: 0 }}
+              style={{ marginTop: 0, padding: '8px 16px', cursor: 'pointer' }}
             >
-              See All
+              See All ({donations.length})
             </button>
           )}
         </div>
@@ -246,13 +246,13 @@ export default function Finance({ user }) {
       <div className="section">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 className="section-title">💳 Expenses</h2>
-          {expenses.length > 5 && (
+          {expenses && expenses.length > 5 && (
             <button 
               className="btn btn-secondary"
               onClick={() => setShowAllExpenses(true)}
-              style={{ marginTop: 0 }}
+              style={{ marginTop: 0, padding: '8px 16px', cursor: 'pointer' }}
             >
-              See All
+              See All ({expenses.length})
             </button>
           )}
         </div>
