@@ -63,10 +63,11 @@ export default function Navbar({ user, onLogout }) {
             <span className="nav-label">Dashboard</span>
           </a>
         </li>
-        <li className="nav-item">
-          <a className={`nav-link ${isActive('/calendar')}`} onClick={() => handleNav('/calendar')}>
+        <li className="nav-item calendar-item">
+          <a className={`nav-link calendar-link ${isActive('/calendar')}`} onClick={() => handleNav('/calendar')}>
             <span className="nav-icon">📅</span>
             <span className="nav-label">Calendar</span>
+            <span className="calendar-badge">NEW</span>
           </a>
         </li>
         <li className="nav-item">
