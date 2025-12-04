@@ -7,6 +7,7 @@ export default function Finance({ user }) {
   const [expenses, setExpenses] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overall');
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [donationForm, setDonationForm] = useState({
@@ -164,19 +165,52 @@ export default function Finance({ user }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1 className="page-title">💰 Finance Management</h1>
-        {canEdit && (
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="button btn-success" onClick={() => setShowDonationModal(true)}>
-              ➕ Record Income
-            </button>
-            <button className="button btn-danger" onClick={() => setShowExpenseModal(true)}>
-              ➕ Record Expense
-            </button>
-          </div>
+        {canEdit && (activeTab === 'overall' || activeTab === 'income') && (
+          <button className="button btn-success" onClick={() => setShowDonationModal(true)}>
+            ➕ Record Income
+          </button>
+        )}
+        {canEdit && (activeTab === 'overall' || activeTab === 'expense') && (
+          <button className="button btn-danger" onClick={() => setShowExpenseModal(true)}>
+            ➕ Record Expense
+          </button>
         )}
       </div>
 
-      {/* Financial Summary */}
+      {/* Tabs Navigation */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '10px', 
+        marginBottom: '25px',
+        borderBottom: '2px solid #ecf0f1',
+        paddingBottom: '0'
+      }}>
+        {['overall', 'income', 'expense'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              padding: '12px 20px',
+              border: 'none',
+              backgroundColor: activeTab === tab ? '#17a2b8' : 'transparent',
+              color: activeTab === tab ? 'white' : '#7f8c8d',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: activeTab === tab ? 'bold' : 'normal',
+              borderBottom: activeTab === tab ? '3px solid #17a2b8' : 'none',
+              marginBottom: '-2px',
+              transition: 'all 0.2s'
+            }}
+          >
+            {tab === 'overall' && '📊 Overall'}
+            {tab === 'income' && '💸 Income'}
+            {tab === 'expense' && '💳 Expenses'}
+          </button>
+        ))}
+      </div>
+
+      {/* Financial Summary - Only show in Overall tab */}
+      {activeTab === 'overall' && (
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-label">Total Income</div>
@@ -203,7 +237,93 @@ export default function Finance({ user }) {
           <div className="stat-value">{formatVND(summary?.expenses_30_days)}</div>
         </div>
       </div>
+      )}
 
+      {/* Income Tab */}
+      {activeTab === 'income' && (
+      <div className="section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 className="section-title">💸 All Income Records</h2>
+          {donations && donations.length > 5 && (
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowAllDonations(true)}
+              style={{ marginTop: 0, padding: '8px 16px', cursor: 'pointer' }}
+            >
+              See All ({donations.length})
+            </button>
+          )}
+        </div>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Contributor</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {donations.map(donation => (
+                <tr key={donation.id}>
+                  <td>{donation.contributor_full_name || donation.contributor_name || 'Anonymous'}</td>
+                  <td>{formatVND(donation.amount)}</td>
+                  <td>{new Date(donation.donated_at).toLocaleDateString()}</td>
+                  <td>{donation.notes || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      )}
+
+      {/* Expense Tab */}
+      {activeTab === 'expense' && (
+      <div className="section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 className="section-title">💳 All Expense Records</h2>
+          {expenses && expenses.length > 5 && (
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowAllExpenses(true)}
+              style={{ marginTop: 0, padding: '8px 16px', cursor: 'pointer' }}
+            >
+              See All ({expenses.length})
+            </button>
+          )}
+        </div>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Recorded By</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {expenses.map(expense => (
+                <tr key={expense.id}>
+                  <td>{expense.description}</td>
+                  <td>{formatVND(expense.amount)}</td>
+                  <td style={{ textTransform: 'capitalize' }}>{expense.category}</td>
+                  <td>{expense.created_by || '-'}</td>
+                  <td>{new Date(expense.recorded_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      )}
+
+      {/* Overall Tab - Original Income and Expense Tables */}
+      {activeTab === 'overall' && (
+      <>
       {/* Donations Table */}
       <div className="section">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -511,6 +631,8 @@ export default function Finance({ user }) {
             </form>
           </div>
         </div>
+      )}
+      </>
       )}
 
       {/* See All Donations Modal */}
