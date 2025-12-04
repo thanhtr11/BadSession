@@ -30,10 +30,13 @@ export default function Calendar() {
   const fetchSessions = async () => {
     try {
       setLoading(true);
+      console.log('Fetching sessions from API...');
       const res = await apiClient.get('/sessions');
+      console.log('Sessions fetched:', res.data);
       setSessions(res.data);
     } catch (error) {
       console.error('Failed to fetch sessions:', error);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
