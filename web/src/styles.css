@@ -458,34 +458,48 @@ tr:hover {
 
   .navbar {
     width: 100%;
-    height: auto;
-    max-height: 70px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0 16px;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
+
   .navbar-header {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .navbar-title {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+
+  .navbar-subtitle {
+    display: none;
   }
 
   .hamburger {
     display: block;
-  }
-
-  /* stacking order fixes */
-  .hamburger {
-    z-index: 1002;
-  }
-
-  .nav-menu.open {
     z-index: 1001;
+    padding: 8px;
+    font-size: 28px;
+    flex-shrink: 0;
   }
 
-  .mobile-backdrop {
-    z-index: 1000;
+  .hamburger:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
   }
 
   .user-info {
@@ -494,50 +508,97 @@ tr:hover {
 
   .nav-menu {
     display: none;
-  }
-
-  .nav-menu.open {
-    display: block;
-    position: fixed; /* overlay */
-    top: 70px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, #ffffff, #f8fafc);
-    padding: 20px 16px;
-    box-shadow: 0 6px 40px rgba(0,0,0,0.15);
-    z-index: 1003; /* sit above backdrop and everything */
-    overflow-y: auto;
-  }
-
-  /* make navbar sit above content on mobile */
-  .navbar {
-    z-index: 1000;
-  }
-
-  /* mobile backdrop to close menu */
-  .mobile-backdrop {
+    list-style: none;
     position: fixed;
     top: 70px;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.35);
-    z-index: 1002; /* behind the menu but above content */
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    padding: 20px 0;
+    overflow-y: auto;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
-  /* show logout inside mobile menu */
-  .nav-menu.open + .logout-btn {
+  .nav-menu.open {
     display: block;
-    margin: 12px 20px;
   }
 
   .nav-item {
-    margin-bottom: 10px;
+    margin: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
+  .nav-link {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: #ecf0f1;
+    text-decoration: none;
+    border-radius: 0;
+    transition: background 0.2s ease;
+  }
+
+  .nav-link:active {
+    background: rgba(23, 162, 184, 0.2);
+  }
+
+  .nav-link.active {
+    background: var(--primary-teal);
+    color: white;
+    border-left: 4px solid white;
+    padding-left: 16px;
+  }
+
+  /* mobile backdrop to close menu */
+  .mobile-backdrop {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+
+  .mobile-backdrop.show {
+    display: block;
+  }
+
+  /* logout button in mobile menu */
   .logout-btn {
     display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    padding: 12px;
+    margin: 0;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .nav-menu.open + .logout-btn {
+    display: block;
+  }
+
+  main {
+    margin-top: 70px;
+  }
+
+  .page-title {
+    margin-bottom: 20px;
   }
 
   .stats-grid {

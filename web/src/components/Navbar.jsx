@@ -39,7 +39,7 @@ export default function Navbar({ user, onLogout }) {
         <div className="user-role">{user?.role}</div>
       </div>
 
-  {menuOpen && <div className="mobile-backdrop" onClick={() => setMenuOpen(false)} />}
+  {menuOpen && <div className="mobile-backdrop show" onClick={() => setMenuOpen(false)} />}
 
   <ul className={`nav-menu ${menuOpen ? 'open' : ''}`}>
         <li className="nav-item">
