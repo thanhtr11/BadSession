@@ -361,15 +361,33 @@ router.get('/settings', authenticateToken, async (req, res) => {
     connection = await pool.getConnection();
     console.log('Getting settings...');
     
-    const [settings] = await connection.execute(
-      'SELECT id, player_monthly_rate, player_monthly_year, player_monthly_month, guest_daily_rate FROM finance_settings WHERE id = 1'
-    );
+    // Try to fetch all columns, but fallback to just guest_daily_rate if columns don't exist
+    let settings;
+    try {
+      const [result] = await connection.execute(
+        'SELECT id, player_monthly_rate, player_monthly_year, player_monthly_month, guest_daily_rate FROM finance_settings WHERE id = 1'
+      );
+      settings = result;
+    } catch (innerError) {
+      // If columns don't exist, fetch only guest_daily_rate
+      console.log('Some columns may not exist, fetching basic settings:', innerError.message);
+      const [result] = await connection.execute(
+        'SELECT id, guest_daily_rate FROM finance_settings WHERE id = 1'
+      );
+      settings = result.map(row => ({
+        ...row,
+        player_monthly_rate: 0,
+        player_monthly_year: null,
+        player_monthly_month: null
+      }));
+    }
     
     console.log('Settings fetched:', settings);
 
     if (settings.length === 0) {
       console.log('No settings found, returning defaults');
       return res.json({ 
+        id: 1,
         player_monthly_rate: 0, 
         player_monthly_year: null, 
         player_monthly_month: null, 
