@@ -38,6 +38,7 @@ html, body, #root {
 
 .app-container {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100%;
 }
@@ -46,80 +47,84 @@ html, body, #root {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
-  height: 100vh;
-  max-height: 100vh;
 }
 
-/* Navbar */
+/* Navbar - Top horizontal */
 .navbar {
-  width: 250px;
+  width: 100%;
+  height: auto;
   background: linear-gradient(135deg, var(--charcoal) 0%, #34495e 100%);
-  padding: 20px;
+  padding: 15px 20px;
   color: white;
-  height: 100%;
-  overflow-y: auto;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  transition: width 0.3s ease, padding 0.3s ease;
-  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  border-bottom: 2px solid var(--primary-teal);
   flex-shrink: 0;
 }
 
 .navbar.collapsed {
-  width: 80px;
-  padding: 20px 10px;
+  width: 100%;
+  padding: 15px 20px;
 }
 
 .navbar.collapsed .navbar-header {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 0;
   margin-top: 0;
   border: none;
   padding-bottom: 0;
-  gap: 10px;
+  gap: 20px;
+  flex: 1;
 }
 
 .navbar.collapsed .navbar-header > div {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .navbar.collapsed .navbar-title {
-  font-size: 28px;
+  font-size: 20px;
   margin: 0;
 }
 
 .navbar.collapsed .navbar-subtitle {
-  display: none;
+  font-size: 11px;
+  color: #bdc3c7;
 }
 
 .navbar.collapsed .user-info {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0;
+  background: transparent;
+  border: none;
 }
 
 .navbar.collapsed .nav-label,
 .navbar.collapsed .logout-label {
-  display: none;
+  display: inline;
 }
 
 .navbar.collapsed .nav-item {
-  margin-bottom: 8px;
+  margin-bottom: 0;
+  display: inline-flex;
 }
 
 .navbar.collapsed .nav-link {
-  padding: 12px 8px;
+  padding: 8px 12px;
   justify-content: center;
 }
 
-.navbar.collapsed .logout-btn {
-  padding: 12px 8px;
-  width: 100%;
-  margin-top: 15px;
-}
-
 .sidebar-toggle {
-  display: block;
+  display: none;
   background: rgba(23, 162, 184, 0.1);
   border: 1px solid var(--primary-teal);
   color: var(--primary-teal);
@@ -139,23 +144,18 @@ html, body, #root {
 }
 
 .navbar.collapsed .sidebar-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid var(--primary-teal);
+  display: none;
 }
 
 .navbar-header {
-  margin-bottom: 30px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--primary-teal);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   position: relative;
+  order: 1;
 }
 
 .navbar-title {
@@ -171,16 +171,21 @@ html, body, #root {
 }
 
 .user-info {
-  padding: 15px;
-  background: rgba(23, 162, 184, 0.1);
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border-left: 3px solid var(--primary-teal);
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  margin-bottom: 0;
+  border-left: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  order: 3;
 }
 
 .user-name {
   font-weight: bold;
-  margin-bottom: 3px;
+  margin-bottom: 0;
+  font-size: 13px;
 }
 
 .user-role {
@@ -190,22 +195,29 @@ html, body, #root {
 
 .nav-menu {
   list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  order: 2;
+  flex: 1;
+  margin: 0 20px;
 }
 
 .nav-item {
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 12px 15px;
+  padding: 8px 12px;
   color: #ecf0f1;
   text-decoration: none;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: all 0.3s ease;
-  font-size: 14px;
-  gap: 10px;
+  font-size: 13px;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .nav-icon {
@@ -233,13 +245,13 @@ html, body, #root {
 /* Calendar Link Highlight */
 .calendar-item {
   position: relative;
-  margin-bottom: 15px !important;
+  margin-bottom: 0 !important;
 }
 
 .calendar-link {
   background: linear-gradient(135deg, rgba(23, 162, 184, 0.15) 0%, rgba(23, 162, 184, 0.05) 100%);
-  border-left: 3px solid var(--primary-teal);
-  border-radius: 6px;
+  border-left: 2px solid var(--primary-teal);
+  border-radius: 4px;
   position: relative;
   overflow: hidden;
 }
@@ -288,32 +300,34 @@ html, body, #root {
 }
 
 .logout-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 20px;
+  width: auto;
+  padding: 8px 12px;
+  margin-top: 0;
   background: var(--danger);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   transition: background 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  order: 4;
+  white-space: nowrap;
 }
 
 .logout-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  min-width: 20px;
+  font-size: 14px;
+  min-width: 16px;
 }
 
 .logout-label {
-  flex: 1;
+  flex: none;
 }
 
 .logout-btn:hover {
