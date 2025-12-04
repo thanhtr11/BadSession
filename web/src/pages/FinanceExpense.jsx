@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
 import { formatVND } from '../utils/format';
-import { formatVND } from '../utils/format';
 
 export default function FinanceExpense({ user }) {
   const [expenses, setExpenses] = useState([]);
@@ -22,6 +21,7 @@ export default function FinanceExpense({ user }) {
   const fetchExpenses = async () => {
     try {
       const res = await apiClient.get('/finance/expenses');
+      console.log('Fetched expenses:', res.data);
       setExpenses(res.data);
     } catch (error) {
       console.error('Failed to fetch expenses:', error);
