@@ -4,6 +4,7 @@ import { formatVND } from '../utils/format';
 
 export default function Players() {
   const [players, setPlayers] = useState([]);
+  const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -19,8 +20,12 @@ export default function Players() {
 
   const fetchPlayers = async () => {
     try {
-      const res = await apiClient.get('/users');
-      setPlayers(res.data.filter(u => u.role === 'Player'));
+      const [usersRes, donationsRes] = await Promise.all([
+        apiClient.get('/users'),
+        apiClient.get('/finance/donations')
+      ]);
+      setPlayers(usersRes.data.filter(u => u.role === 'Player'));
+      setDonations(donationsRes.data || []);
     } catch (error) {
       console.error('Failed to fetch players:', error);
     } finally {
@@ -55,6 +60,20 @@ export default function Players() {
   return (
     <div>
       <h1 className="page-title">👥 Players</h1>
+
+      {/* Stats Section */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-label">Total Players</div>
+          <div className="stat-value">{players.length}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Total Income</div>
+          <div className="stat-value">{formatVND(donations
+            .filter(d => !d.is_guest)
+            .reduce((sum, d) => sum + parseFloat(d.amount || 0), 0))}</div>
+        </div>
+      </div>
 
       <div className="section">
         <div className="table-wrapper">

@@ -24,6 +24,8 @@ export default function Finance({ user }) {
     amount: '',
     category: ''
   });
+  const [showAllDonations, setShowAllDonations] = useState(false);
+  const [showAllExpenses, setShowAllExpenses] = useState(false);
 
   useEffect(() => {
     fetchFinanceData();
@@ -204,7 +206,18 @@ export default function Finance({ user }) {
 
       {/* Donations Table */}
       <div className="section">
-        <h2 className="section-title">💸 Income</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 className="section-title">💸 Income</h2>
+          {donations.length > 5 && (
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowAllDonations(true)}
+              style={{ marginTop: 0 }}
+            >
+              See All
+            </button>
+          )}
+        </div>
         <div className="table-wrapper">
           <table>
             <thead>
@@ -231,7 +244,18 @@ export default function Finance({ user }) {
 
       {/* Expenses Table */}
       <div className="section">
-        <h2 className="section-title">💳 Expenses</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 className="section-title">💳 Expenses</h2>
+          {expenses.length > 5 && (
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowAllExpenses(true)}
+              style={{ marginTop: 0 }}
+            >
+              See All
+            </button>
+          )}
+        </div>
         <div className="table-wrapper">
           <table>
             <thead>
@@ -485,6 +509,88 @@ export default function Finance({ user }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* See All Donations Modal */}
+      {showAllDonations && (
+        <div className="modal-overlay" onClick={() => setShowAllDonations(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px', maxHeight: '80vh', overflowY: 'auto' }}>
+            <div className="modal-header">
+              <span>All Income Records ({donations.length})</span>
+              <button 
+                type="button" 
+                onClick={() => setShowAllDonations(false)}
+                style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="table-wrapper" style={{ margin: '20px' }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Contributor</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {donations.map(donation => (
+                    <tr key={donation.id}>
+                      <td>{donation.contributor_full_name || donation.contributor_name || 'Anonymous'}</td>
+                      <td>{formatVND(donation.amount)}</td>
+                      <td>{new Date(donation.donated_at).toLocaleDateString()}</td>
+                      <td>{donation.notes || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* See All Expenses Modal */}
+      {showAllExpenses && (
+        <div className="modal-overlay" onClick={() => setShowAllExpenses(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px', maxHeight: '80vh', overflowY: 'auto' }}>
+            <div className="modal-header">
+              <span>All Expense Records ({expenses.length})</span>
+              <button 
+                type="button" 
+                onClick={() => setShowAllExpenses(false)}
+                style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="table-wrapper" style={{ margin: '20px' }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Recorded By</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {expenses.map(expense => (
+                    <tr key={expense.id}>
+                      <td>{expense.description}</td>
+                      <td>{formatVND(expense.amount)}</td>
+                      <td style={{ textTransform: 'capitalize' }}>{expense.category}</td>
+                      <td>{expense.created_by || '-'}</td>
+                      <td>{new Date(expense.created_at).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
