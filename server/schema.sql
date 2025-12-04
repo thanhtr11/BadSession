@@ -71,6 +71,10 @@ CREATE TABLE IF NOT EXISTS finance_settings (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Add missing columns to finance_settings if they don't exist
+ALTER TABLE finance_settings ADD COLUMN IF NOT EXISTS player_monthly_year INT;
+ALTER TABLE finance_settings ADD COLUMN IF NOT EXISTS player_monthly_month INT;
+
 -- Insert default finance settings
 INSERT IGNORE INTO finance_settings (id, player_monthly_rate, guest_daily_rate) 
 VALUES (1, 0, 0);
