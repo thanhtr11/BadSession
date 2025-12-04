@@ -157,17 +157,31 @@ export default function FinanceIncome({ user }) {
                 <td>{donation.notes || '-'}</td>
                 {canEdit && (
                   <td>
-                    {!donation.is_paid ? (
-                      <button
-                        className="button btn-success"
-                        onClick={() => handleMarkAsPaid(donation.id)}
-                        style={{ padding: '6px 12px', fontSize: '12px', margin: 0 }}
-                      >
-                        ✓ Paid
-                      </button>
-                    ) : (
-                      <span style={{ color: '#27ae60', fontWeight: 'bold' }}>✓</span>
-                    )}
+                    <button
+                      onClick={() => handleMarkAsPaid(donation.id)}
+                      style={{
+                        padding: '6px 16px',
+                        fontSize: '12px',
+                        margin: 0,
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        backgroundColor: donation.is_paid ? '#27ae60' : '#e74c3c',
+                        color: 'white'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.opacity = '0.9';
+                        e.target.style.transform = 'scale(1.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.opacity = '1';
+                        e.target.style.transform = 'scale(1)';
+                      }}
+                    >
+                      {donation.is_paid ? '✓ Paid' : '💰 Pay'}
+                    </button>
                   </td>
                 )}
               </tr>
