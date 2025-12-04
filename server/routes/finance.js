@@ -100,9 +100,9 @@ router.get('/summary', authenticateToken, async (req, res) => {
   try {
     const connection = await pool.getConnection();
 
-    // Total donations
+    // Total paid donations
     const [donationData] = await connection.execute(
-      'SELECT COALESCE(SUM(amount), 0) as total_donations FROM donations'
+      'SELECT COALESCE(SUM(amount), 0) as total_donations FROM donations WHERE is_paid = TRUE'
     );
 
     // Total expenses
@@ -110,9 +110,9 @@ router.get('/summary', authenticateToken, async (req, res) => {
       'SELECT COALESCE(SUM(amount), 0) as total_expenses FROM expenses'
     );
 
-    // Last 30 days donations
+    // Last 30 days paid donations
     const [last30Donations] = await connection.execute(
-      'SELECT COALESCE(SUM(amount), 0) as total_30_days FROM donations WHERE donated_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)'
+      'SELECT COALESCE(SUM(amount), 0) as total_30_days FROM donations WHERE is_paid = TRUE AND donated_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)'
     );
 
     // Last 30 days expenses
@@ -241,6 +241,31 @@ router.get('/search', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to search' });
+  }
+});
+
+// Mark income record as paid (Admin only)
+router.post('/income/:id/paid', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const connection = await pool.getConnection();
+
+    const [result] = await connection.execute(
+      'UPDATE donations SET is_paid = TRUE WHERE id = ?',
+      [id]
+    );
+
+    await connection.release();
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Income record not found' });
+    }
+
+    res.json({ message: 'Income record marked as paid' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to mark as paid' });
   }
 });
 

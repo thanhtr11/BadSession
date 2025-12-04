@@ -97,6 +97,20 @@ export default function FinanceIncome({ user }) {
     }
   };
 
+  const handleMarkAsPaid = async (donationId) => {
+    if (user?.role !== 'Admin') {
+      alert('Only admins can mark as paid');
+      return;
+    }
+    try {
+      await apiClient.post(`/finance/income/${donationId}/paid`);
+      fetchIncome();
+    } catch (error) {
+      console.error('Failed to mark as paid:', error);
+      alert('Failed to mark as paid');
+    }
+  };
+
   if (loading) return <div className="loading">Loading Income Records...</div>;
 
   return (
@@ -117,7 +131,9 @@ export default function FinanceIncome({ user }) {
               <th>Contributor</th>
               <th>Amount</th>
               <th>Date</th>
+              <th>Status</th>
               <th>Notes</th>
+              {canEdit && <th>Action</th>}
             </tr>
           </thead>
           <tbody>
@@ -126,7 +142,34 @@ export default function FinanceIncome({ user }) {
                 <td>{donation.contributor_full_name || donation.contributor_name || 'Anonymous'}</td>
                 <td>{formatVND(donation.amount)}</td>
                 <td>{new Date(donation.donated_at).toLocaleDateString()}</td>
+                <td>
+                  <span style={{
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    backgroundColor: donation.is_paid ? '#d4edda' : '#fff3cd',
+                    color: donation.is_paid ? '#155724' : '#856404'
+                  }}>
+                    {donation.is_paid ? '✓ Paid' : 'Pending'}
+                  </span>
+                </td>
                 <td>{donation.notes || '-'}</td>
+                {canEdit && (
+                  <td>
+                    {!donation.is_paid ? (
+                      <button
+                        className="button btn-success"
+                        onClick={() => handleMarkAsPaid(donation.id)}
+                        style={{ padding: '6px 12px', fontSize: '12px', margin: 0 }}
+                      >
+                        ✓ Paid
+                      </button>
+                    ) : (
+                      <span style={{ color: '#27ae60', fontWeight: 'bold' }}>✓</span>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
