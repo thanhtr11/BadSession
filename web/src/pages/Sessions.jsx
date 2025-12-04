@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
-import MatchManager from '../components/MatchManager';
+import Matches from '../components/Matches';
 
 export default function Sessions() {
   const [sessions, setSessions] = useState([]);
@@ -21,6 +21,7 @@ export default function Sessions() {
   const [editModal, setEditModal] = useState(false);
   const [editingAttendance, setEditingAttendance] = useState(null);
   const [editGuestName, setEditGuestName] = useState('');
+  const [showMatches, setShowMatches] = useState(false);
 
   useEffect(() => {
     try {
@@ -249,6 +250,25 @@ export default function Sessions() {
                 </form>
               </div>
 
+              {/* Matches Section */}
+              {showMatches ? (
+                <Matches 
+                  sessionId={sessionDetails.id} 
+                  sessionDetails={sessionDetails}
+                  onClose={() => setShowMatches(false)}
+                />
+              ) : (
+                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                  <button 
+                    onClick={() => setShowMatches(true)}
+                    className="button btn-primary"
+                    style={{ fontSize: '14px' }}
+                  >
+                    🏸 View/Manage Matches
+                  </button>
+                </div>
+              )}
+
               {/* Attendees Section */}
               {sessionDetails.attendance && sessionDetails.attendance.length > 0 ? (
                 <div>
@@ -305,11 +325,6 @@ export default function Sessions() {
                   No one has checked in yet
                 </div>
               )}
-
-              {/* Match Manager Component */}
-              <div style={{ marginTop: '25px', borderTop: '2px solid #17a2b8', paddingTop: '20px' }}>
-                <MatchManager sessionId={selectedSession.id} sessionDetails={sessionDetails} />
-              </div>
             </div>
 
             <div className="modal-footer">

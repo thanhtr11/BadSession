@@ -14,7 +14,7 @@ const sessionRoutes = require('./routes/sessions');
 const attendanceRoutes = require('./routes/attendance');
 const financeRoutes = require('./routes/finance');
 const dashboardRoutes = require('./routes/dashboard');
-const matchRoutes = require('./routes/matches');
+const matchesRoutes = require('./routes/matches');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -23,7 +23,7 @@ app.use('/api/sessions', sessionRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/matches', matchRoutes);
+app.use('/api/matches', matchesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

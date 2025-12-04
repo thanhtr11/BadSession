@@ -61,6 +61,29 @@ CREATE TABLE IF NOT EXISTS expenses (
   FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE RESTRICT
 );
 
+-- Matches table (v2.0 feature)
+CREATE TABLE IF NOT EXISTS matches (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  session_id INT NOT NULL,
+  match_name VARCHAR(255),
+  player1_id INT,
+  player1_guest_name VARCHAR(255),
+  player1_is_guest BOOLEAN DEFAULT FALSE,
+  player2_id INT,
+  player2_guest_name VARCHAR(255),
+  player2_is_guest BOOLEAN DEFAULT FALSE,
+  player1_score INT DEFAULT 0,
+  player2_score INT DEFAULT 0,
+  match_status ENUM('Pending', 'In Progress', 'Completed', 'Cancelled') DEFAULT 'Pending',
+  created_by INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE,
+  FOREIGN KEY (player1_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (player2_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT
+);
+
 -- Finance Settings table
 CREATE TABLE IF NOT EXISTS finance_settings (
   id INT PRIMARY KEY DEFAULT 1,
@@ -78,46 +101,6 @@ ALTER TABLE finance_settings ADD COLUMN IF NOT EXISTS player_monthly_month INT;
 -- Insert default finance settings
 INSERT IGNORE INTO finance_settings (id, player_monthly_rate, guest_daily_rate) 
 VALUES (1, 0, 0);
-
--- Matches table - stores badminton matches
-CREATE TABLE IF NOT EXISTS matches (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  session_id INT NOT NULL,
-  match_number INT NOT NULL,
-  match_type ENUM('Singles', 'Doubles', 'Mixed Doubles') DEFAULT 'Singles',
-  status ENUM('Pending', 'In Progress', 'Completed') DEFAULT 'Pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE,
-  UNIQUE KEY unique_match_per_session (session_id, match_number)
-);
-
--- Match Players table - links players/guests to matches
-CREATE TABLE IF NOT EXISTS match_players (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  match_id INT NOT NULL,
-  user_id INT,
-  guest_name VARCHAR(255),
-  is_guest BOOLEAN DEFAULT FALSE,
-  team ENUM('Team A', 'Team B') NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-  UNIQUE KEY unique_player_per_match (match_id, team, user_id, is_guest)
-);
-
--- Match Results table - stores match scores
-CREATE TABLE IF NOT EXISTS match_results (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  match_id INT NOT NULL,
-  team_a_score INT DEFAULT 0,
-  team_b_score INT DEFAULT 0,
-  winner ENUM('Team A', 'Team B') DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE CASCADE,
-  UNIQUE KEY unique_result_per_match (match_id)
-);
 
 -- Insert default admin user
 INSERT IGNORE INTO users (id, username, password, full_name, role) 
