@@ -253,15 +253,51 @@ export default function Finance({ user }) {
               </div>
 
               {donationForm.is_guest ? (
-                <div className="form-group">
+                <div className="form-group" style={{ position: 'relative' }}>
                   <label className="form-label">Guest Name</label>
                   <input
                     type="text"
                     className="form-input"
-                    value={donationForm.contributor_name}
-                    onChange={e => setDonationForm({ ...donationForm, contributor_name: e.target.value })}
+                    placeholder="Search guest name..."
+                    value={searchQuery}
+                    onChange={(e) => handleSearchContributor(e.target.value)}
+                    onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
                     required
                   />
+                  {showSearchResults && searchResults.length > 0 && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: '0',
+                      right: '0',
+                      backgroundColor: 'white',
+                      border: '1px solid #17a2b8',
+                      borderTop: 'none',
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                      zIndex: '1000',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      marginTop: '-4px',
+                      borderRadius: '0 0 4px 4px'
+                    }}>
+                      {searchResults.map((result) => (
+                        <div
+                          key={result.id}
+                          onClick={() => handleSelectContributor({ id: result.id, full_name: result.full_name || result.name, name: result.name })}
+                          style={{
+                            padding: '10px 15px',
+                            cursor: 'pointer',
+                            borderBottom: '1px solid #ecf0f1',
+                            transition: 'background-color 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+                          onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                        >
+                          <div style={{ fontWeight: 'bold', color: '#2c3e50' }}>{result.full_name || result.name}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="form-group" style={{ position: 'relative' }}>
