@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Sessions from './pages/Sessions';
+import Calendar from './pages/Calendar';
 import Players from './pages/Players';
 import Guests from './pages/Guests';
 import Finance from './pages/Finance';
@@ -86,6 +87,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/sessions" element={<Sessions />} />
+              <Route path="/calendar" element={<Calendar />} />
               <Route path="/players" element={<Players />} />
               <Route path="/guests" element={<Guests />} />
               <Route path="/finance/*" element={<Finance user={user} />} />
