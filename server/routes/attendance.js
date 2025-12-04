@@ -4,6 +4,28 @@ const { authenticateToken } = require('../auth');
 
 const router = express.Router();
 
+// Get recent attendance records (including guests)
+router.get('/', authenticateToken, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [attendance] = await connection.execute(
+      `SELECT a.id, a.session_id, a.user_id, a.guest_name, a.is_guest, a.check_in_time, a.checked_in_by,
+              COALESCE(u.full_name, a.guest_name) as name,
+              checked_in_player.full_name as checked_in_by_name
+       FROM attendance a
+       LEFT JOIN users u ON a.user_id = u.id
+       LEFT JOIN users checked_in_player ON a.checked_in_by = checked_in_player.id
+       ORDER BY a.check_in_time DESC`
+    );
+
+    await connection.release();
+    res.json(attendance);
+  } catch (error) {
+    console.error('Failed to fetch attendance:', error);
+    res.status(500).json({ error: 'Failed to fetch attendance' });
+  }
+});
+
 // Check in player (self) or guest
 router.post('/check-in', authenticateToken, async (req, res) => {
   try {
