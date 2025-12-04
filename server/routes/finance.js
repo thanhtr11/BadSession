@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Record donation (Admin only)
 router.post('/donations', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
   try {
     const { contributor_id, contributor_name, is_guest, amount, notes } = req.body;
 
@@ -13,24 +14,25 @@ router.post('/donations', authenticateToken, authorizeRole('Admin'), async (req,
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [result] = await connection.execute(
       'INSERT INTO donations (contributor_id, contributor_name, is_guest, amount, notes) VALUES (?, ?, ?, ?, ?)',
       [is_guest ? null : contributor_id, is_guest ? contributor_name : null, is_guest, amount, notes || null]
     );
 
-    await connection.release();
-
     res.status(201).json({ message: 'Donation recorded', donation_id: result.insertId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to record donation' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
 // Record expense (Admin only)
 router.post('/expenses', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
   try {
     const { description, amount, category } = req.body;
 
@@ -38,19 +40,19 @@ router.post('/expenses', authenticateToken, authorizeRole('Admin'), async (req, 
       return res.status(400).json({ error: 'Description and amount required' });
     }
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [result] = await connection.execute(
       'INSERT INTO expenses (description, amount, category, recorded_by) VALUES (?, ?, ?, ?)',
       [description, amount, category || null, req.user.id]
     );
 
-    await connection.release();
-
     res.status(201).json({ message: 'Expense recorded', expense_id: result.insertId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to record expense' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
@@ -145,8 +147,9 @@ router.get('/summary', authenticateToken, async (req, res) => {
 
 // Get top donors/contributors
 router.get('/donations/top/contributors', authenticateToken, async (req, res) => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [contributors] = await connection.execute(
       `SELECT 
@@ -160,16 +163,18 @@ router.get('/donations/top/contributors', authenticateToken, async (req, res) =>
        LIMIT 10`
     );
 
-    await connection.release();
     res.json(contributors);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to retrieve contributors' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
 // Alias routes for income (same as donations)
 router.post('/income', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
   try {
     const { contributor_id, contributor_name, is_guest, amount, notes } = req.body;
 
@@ -177,19 +182,19 @@ router.post('/income', authenticateToken, authorizeRole('Admin'), async (req, re
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [result] = await connection.execute(
       'INSERT INTO donations (contributor_id, contributor_name, is_guest, amount, notes) VALUES (?, ?, ?, ?, ?)',
       [is_guest ? null : contributor_id, is_guest ? contributor_name : null, is_guest, amount, notes || null]
     );
 
-    await connection.release();
-
     res.status(201).json({ message: 'Income recorded', income_id: result.insertId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to record income' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
@@ -217,6 +222,7 @@ router.get('/income', authenticateToken, async (req, res) => {
 
 // Search players or guests by name
 router.get('/search', authenticateToken, async (req, res) => {
+  let connection;
   try {
     const { type, query } = req.query;
 
@@ -224,7 +230,7 @@ router.get('/search', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Type and query parameters required' });
     }
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     const searchTerm = `%${query}%`;
 
     let results = [];
@@ -243,27 +249,27 @@ router.get('/search', authenticateToken, async (req, res) => {
       results = guests.map(g => ({ id: g.name, full_name: g.name, name: g.name }));
     }
 
-    await connection.release();
     res.json(results);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to search' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
 // Mark income record as paid (Admin only)
 router.post('/income/:id/paid', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
   try {
     const { id } = req.params;
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [result] = await connection.execute(
       'UPDATE donations SET is_paid = TRUE WHERE id = ?',
       [id]
     );
-
-    await connection.release();
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Income record not found' });
@@ -273,15 +279,18 @@ router.post('/income/:id/paid', authenticateToken, authorizeRole('Admin'), async
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to mark as paid' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
 // Toggle income record paid status (Admin only)
 router.post('/income/:id/toggle-paid', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
   try {
     const { id } = req.params;
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     // Get current paid status
     const [donation] = await connection.execute(
@@ -290,7 +299,6 @@ router.post('/income/:id/toggle-paid', authenticateToken, authorizeRole('Admin')
     );
 
     if (donation.length === 0) {
-      await connection.release();
       return res.status(404).json({ error: 'Income record not found' });
     }
 
@@ -302,21 +310,22 @@ router.post('/income/:id/toggle-paid', authenticateToken, authorizeRole('Admin')
       [newPaidStatus, id]
     );
 
-    await connection.release();
-
     res.json({ message: 'Income record status toggled', is_paid: newPaidStatus });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to toggle paid status' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
 // Toggle expense paid status (Admin only)
 router.post('/expenses/:id/toggle-paid', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  let connection;
   try {
     const { id } = req.params;
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     // Get current paid status
     const [expense] = await connection.execute(
@@ -325,7 +334,6 @@ router.post('/expenses/:id/toggle-paid', authenticateToken, authorizeRole('Admin
     );
 
     if (expense.length === 0) {
-      await connection.release();
       return res.status(404).json({ error: 'Expense record not found' });
     }
 
@@ -337,12 +345,12 @@ router.post('/expenses/:id/toggle-paid', authenticateToken, authorizeRole('Admin
       [newPaidStatus, id]
     );
 
-    await connection.release();
-
     res.json({ message: 'Expense record status toggled', is_paid: newPaidStatus });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to toggle paid status' });
+  } finally {
+    if (connection) await connection.release();
   }
 });
 
@@ -351,12 +359,16 @@ router.get('/settings', authenticateToken, async (req, res) => {
   let connection;
   try {
     connection = await pool.getConnection();
+    console.log('Getting settings...');
     
     const [settings] = await connection.execute(
-      'SELECT player_monthly_rate, player_monthly_year, player_monthly_month, guest_daily_rate FROM finance_settings WHERE id = 1'
+      'SELECT id, player_monthly_rate, player_monthly_year, player_monthly_month, guest_daily_rate FROM finance_settings WHERE id = 1'
     );
+    
+    console.log('Settings fetched:', settings);
 
     if (settings.length === 0) {
+      console.log('No settings found, returning defaults');
       return res.json({ 
         player_monthly_rate: 0, 
         player_monthly_year: null, 
@@ -365,10 +377,11 @@ router.get('/settings', authenticateToken, async (req, res) => {
       });
     }
 
+    console.log('Returning settings:', settings[0]);
     res.json(settings[0]);
   } catch (error) {
     console.error('Error fetching settings:', error);
-    res.status(500).json({ error: 'Failed to fetch settings' });
+    res.status(500).json({ error: 'Failed to fetch settings', details: error.message });
   } finally {
     if (connection) await connection.release();
   }
