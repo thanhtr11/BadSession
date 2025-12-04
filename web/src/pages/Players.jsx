@@ -20,12 +20,12 @@ export default function Players() {
 
   const fetchPlayers = async () => {
     try {
-      const [usersRes, donationsRes] = await Promise.all([
+      const [usersRes, incomeRes] = await Promise.all([
         apiClient.get('/users'),
-        apiClient.get('/finance/donations')
+        apiClient.get('/finance/income')
       ]);
       setPlayers(usersRes.data.filter(u => u.role === 'Player'));
-      setDonations(donationsRes.data || []);
+      setDonations(incomeRes.data || []);
     } catch (error) {
       console.error('Failed to fetch players:', error);
     } finally {
@@ -36,18 +36,18 @@ export default function Players() {
   const handleViewPlayer = async (player) => {
     setSelectedPlayer(player);
     try {
-      const [attendanceRes, donationsRes] = await Promise.all([
+      const [attendanceRes, incomeRes] = await Promise.all([
         apiClient.get(`/attendance/player/${player.id}/history`),
-        apiClient.get('/finance/donations')
+        apiClient.get('/finance/income')
       ]);
 
-      const playerDonations = donationsRes.data.filter(d => d.contributor_id === player.id && !d.is_guest);
-      const totalDonated = playerDonations.reduce((sum, d) => sum + parseFloat(d.amount), 0);
+      const playerIncome = incomeRes.data.filter(d => d.contributor_id === player.id && !d.is_guest);
+      const totalIncome = playerIncome.reduce((sum, d) => sum + parseFloat(d.amount), 0);
 
       setPlayerDetails({
         attendance: attendanceRes.data,
-        donations: playerDonations,
-        total_donations: totalDonated
+        donations: playerIncome,
+        total_donations: totalIncome
       });
       setShowDetailsModal(true);
     } catch (error) {

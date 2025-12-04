@@ -33,12 +33,12 @@ export default function Finance({ user }) {
 
   const fetchFinanceData = async () => {
     try {
-      const [donationsRes, expensesRes, summaryRes] = await Promise.all([
-        apiClient.get('/finance/donations'),
+      const [incomeRes, expensesRes, summaryRes] = await Promise.all([
+        apiClient.get('/finance/income'),
         apiClient.get('/finance/expenses'),
         apiClient.get('/finance/summary')
       ]);
-      setDonations(donationsRes.data);
+      setDonations(incomeRes.data);
       setExpenses(expensesRes.data);
       setSummary(summaryRes.data);
     } catch (error) {
@@ -115,7 +115,7 @@ export default function Finance({ user }) {
         contributor_id: donationForm.is_guest ? null : parseInt(donationForm.contributor_id),
         contributor_name: donationForm.is_guest ? donationForm.contributor_name : ''
       };
-      await apiClient.post('/finance/donations', payload);
+      await apiClient.post('/finance/income', payload);
       setShowDonationModal(false);
       setDonationForm({
         contributor_name: '',
@@ -229,7 +229,7 @@ export default function Finance({ user }) {
               </tr>
             </thead>
             <tbody>
-              {donations.map(donation => (
+              {donations.slice(0, 5).map(donation => (
                 <tr key={donation.id}>
                   <td>{donation.contributor_full_name || donation.contributor_name || 'Anonymous'}</td>
                   <td>{formatVND(donation.amount)}</td>
@@ -268,7 +268,7 @@ export default function Finance({ user }) {
               </tr>
             </thead>
             <tbody>
-              {expenses.map(expense => (
+              {expenses.slice(0, 5).map(expense => (
                 <tr key={expense.id}>
                   <td>{expense.description}</td>
                   <td>{formatVND(expense.amount)}</td>

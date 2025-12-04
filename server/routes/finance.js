@@ -163,6 +163,51 @@ router.get('/donations/top/contributors', authenticateToken, async (req, res) =>
   }
 });
 
+// Alias routes for income (same as donations)
+router.post('/income', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  try {
+    const { contributor_id, contributor_name, is_guest, amount, notes } = req.body;
+
+    if (!amount || (is_guest && !contributor_name) || (!is_guest && !contributor_id)) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const connection = await pool.getConnection();
+
+    const [result] = await connection.execute(
+      'INSERT INTO donations (contributor_id, contributor_name, is_guest, amount, notes) VALUES (?, ?, ?, ?, ?)',
+      [is_guest ? null : contributor_id, is_guest ? contributor_name : null, is_guest, amount, notes || null]
+    );
+
+    await connection.release();
+
+    res.status(201).json({ message: 'Income recorded', income_id: result.insertId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to record income' });
+  }
+});
+
+router.get('/income', authenticateToken, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+
+    const [income] = await connection.execute(
+      `SELECT d.id, d.contributor_id, d.contributor_name, d.is_guest, d.amount, d.notes, d.donated_at,
+              CASE WHEN d.is_guest THEN d.contributor_name ELSE u.full_name END as contributor_full_name
+       FROM donations d
+       LEFT JOIN users u ON d.contributor_id = u.id
+       ORDER BY d.donated_at DESC`
+    );
+
+    await connection.release();
+    res.json(income);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to retrieve income' });
+  }
+});
+
 // Search players or guests by name
 router.get('/search', authenticateToken, async (req, res) => {
   try {
