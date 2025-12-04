@@ -72,8 +72,8 @@ export default function Guests() {
           <div className="stat-value">{guests.reduce((sum, g) => sum + g.sessions, 0)}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Total Guest Donations</div>
-          <div className="stat-value">${guests.reduce((sum, g) => sum + g.donations, 0).toFixed(2)}</div>
+          <div className="stat-label">Total Guest Income</div>
+          <div className="stat-value">${Number(guests.reduce((sum, g) => sum + g.donations, 0) || 0).toFixed(2)}</div>
         </div>
       </div>
 
@@ -84,7 +84,7 @@ export default function Guests() {
               <tr>
                 <th>Guest Name</th>
                 <th>Sessions Attended</th>
-                <th>Total Donations</th>
+                <th>Total Income</th>
               </tr>
             </thead>
             <tbody>
@@ -92,7 +92,7 @@ export default function Guests() {
                 <tr key={idx}>
                   <td>{guest.name}</td>
                   <td>{guest.sessions}</td>
-                  <td>${guest.donations.toFixed(2)}</td>
+                  <td>${Number(guest.donations || 0).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>

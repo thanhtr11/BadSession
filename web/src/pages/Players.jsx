@@ -99,7 +99,7 @@ export default function Players() {
                   <strong>Username:</strong> {selectedPlayer.username}
                 </div>
                 <div style={{ marginBottom: '10px' }}>
-                  <strong>Total Donations:</strong> ${Number(playerDetails.total_donations || 0).toFixed(2)}
+                  <strong>Total Income:</strong> ${Number(playerDetails.total_donations || 0).toFixed(2)}
                 </div>
                 <div>
                   <strong>Sessions Attended:</strong> {playerDetails.attendance.length}
@@ -132,17 +132,17 @@ export default function Players() {
                 <p>No attendance records</p>
               )}
 
-              <h3 style={{ marginTop: '20px', marginBottom: '10px' }}>💸 Donation History</h3>
+              <h3 style={{ marginTop: '20px', marginBottom: '10px' }}>💸 Income History</h3>
               {playerDetails.donations.length > 0 ? (
                 <div className="table-wrapper">
                   <table>
                     <thead>
-                      <tr>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Notes</th>
-                      </tr>
-                    </thead>
+                          <tr>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Notes</th>
+                          </tr>
+                        </thead>
                     <tbody>
                       {playerDetails.donations.map(donation => (
                         <tr key={donation.id}>
@@ -155,7 +155,7 @@ export default function Players() {
                   </table>
                 </div>
               ) : (
-                <p>No donations</p>
+                <p>No income records</p>
               )}
             </div>
 

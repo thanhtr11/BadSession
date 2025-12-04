@@ -37,7 +37,7 @@ export default function Dashboard() {
           <div className="stat-value">{dashboard?.guest_count || 0}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Total Fund</div>
+          <div className="stat-label">Total Income</div>
           <div className="stat-value">${dashboard?.total_donations?.toFixed(2) || '0.00'}</div>
         </div>
         <div className="stat-card">
@@ -47,7 +47,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Donations (30 days)</div>
+          <div className="stat-label">Income (30 days)</div>
           <div className="stat-value">${dashboard?.donations_30_days?.toFixed(2) || '0.00'}</div>
         </div>
         <div className="stat-card">
@@ -83,8 +83,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="section">
-        <h2 className="section-title">💸 Recent Donations (Last 5)</h2>
+  <div className="section">
+  <h2 className="section-title">💸 Recent Income (Last 5)</h2>
         <div className="table-wrapper">
           <table>
             <thead>

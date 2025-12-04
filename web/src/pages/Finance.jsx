@@ -77,7 +77,7 @@ export default function Finance({ user }) {
   const handleAddDonation = async (e) => {
     e.preventDefault();
     if (user?.role !== 'Admin') {
-      alert('Only admins can record donations');
+      alert('Only admins can record income');
       return;
     }
     try {
@@ -99,8 +99,8 @@ export default function Finance({ user }) {
       });
       fetchFinanceData();
     } catch (error) {
-      console.error('Failed to record donation:', error);
-      alert('Failed to record donation');
+      console.error('Failed to record income:', error);
+      alert('Failed to record income');
     }
   };
 
@@ -140,7 +140,7 @@ export default function Finance({ user }) {
         {canEdit && (
           <div style={{ display: 'flex', gap: '10px' }}>
             <button className="button btn-success" onClick={() => setShowDonationModal(true)}>
-              ➕ Record Donation
+              ➕ Record Income
             </button>
             <button className="button btn-danger" onClick={() => setShowExpenseModal(true)}>
               ➕ Record Expense
@@ -152,7 +152,7 @@ export default function Finance({ user }) {
       {/* Financial Summary */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-label">Total Donations</div>
+          <div className="stat-label">Total Income</div>
           <div className="stat-value">${summary?.total_donations?.toFixed(2) || '0.00'}</div>
         </div>
         <div className="stat-card">
@@ -168,7 +168,7 @@ export default function Finance({ user }) {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Donations (30 days)</div>
+          <div className="stat-label">Income (30 days)</div>
           <div className="stat-value">${summary?.donations_30_days?.toFixed(2) || '0.00'}</div>
         </div>
         <div className="stat-card">
@@ -179,7 +179,7 @@ export default function Finance({ user }) {
 
       {/* Donations Table */}
       <div className="section">
-        <h2 className="section-title">💸 Donations</h2>
+        <h2 className="section-title">💸 Income</h2>
         <div className="table-wrapper">
           <table>
             <thead>
@@ -237,7 +237,7 @@ export default function Finance({ user }) {
       {showDonationModal && (
         <div className="modal-overlay" onClick={() => setShowDonationModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">Record Donation</div>
+            <div className="modal-header">Record Income</div>
             <form onSubmit={handleAddDonation}>
               <div className="form-group">
                 <label className="form-label">Contributor Type</label>
@@ -362,7 +362,7 @@ export default function Finance({ user }) {
                   Cancel
                 </button>
                 <button type="submit" className="button btn-success">
-                  Record Donation
+                  Record Income
                 </button>
               </div>
             </form>
