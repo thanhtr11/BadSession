@@ -88,7 +88,7 @@ function App() {
               <Route path="/sessions" element={<Sessions />} />
               <Route path="/players" element={<Players />} />
               <Route path="/guests" element={<Guests />} />
-              <Route path="/finance" element={<Finance user={user} />} />
+              <Route path="/finance/*" element={<Finance user={user} />} />
               {user?.role === 'Admin' && (
                 <Route path="/admin" element={<AdminPanel />} />
               )}
