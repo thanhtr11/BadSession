@@ -3,6 +3,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import FinanceOverall from './FinanceOverall';
 import FinanceIncome from './FinanceIncome';
 import FinanceExpense from './FinanceExpense';
+import FinanceSetting from './FinanceSetting';
 
 export default function Finance({ user }) {
   const location = useLocation();
@@ -78,6 +79,25 @@ export default function Finance({ user }) {
         >
           💳 Expenses
         </Link>
+        <Link
+          to="/finance/setting"
+          style={{
+            padding: '12px 20px',
+            border: 'none',
+            backgroundColor: isActive('/finance/setting') ? '#17a2b8' : 'transparent',
+            color: isActive('/finance/setting') ? 'white' : '#7f8c8d',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: isActive('/finance/setting') ? 'bold' : 'normal',
+            borderBottom: isActive('/finance/setting') ? '3px solid #17a2b8' : 'none',
+            marginBottom: '-2px',
+            transition: 'all 0.2s',
+            textDecoration: 'none',
+            display: 'inline-block'
+          }}
+        >
+          ⚙️ Settings
+        </Link>
       </div>
 
       {/* Sub-page Content */}
@@ -85,6 +105,7 @@ export default function Finance({ user }) {
         <Route path="/overall" element={<FinanceOverall user={user} />} />
         <Route path="/income" element={<FinanceIncome user={user} />} />
         <Route path="/expense" element={<FinanceExpense user={user} />} />
+        <Route path="/setting" element={<FinanceSetting user={user} />} />
         {/* Default to overall */}
         <Route path="/" element={<FinanceOverall user={user} />} />
       </Routes>
