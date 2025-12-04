@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Navbar({ user, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -18,8 +19,12 @@ export default function Navbar({ user, onLogout }) {
     setMenuOpen(false);
   };
 
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${sidebarCollapsed ? 'collapsed' : ''}`}>
       <button
         className="hamburger"
         aria-label="Toggle navigation"
@@ -27,6 +32,15 @@ export default function Navbar({ user, onLogout }) {
         onClick={() => setMenuOpen(!menuOpen)}
       >
         ☰
+      </button>
+
+      <button
+        className="sidebar-toggle"
+        aria-label="Toggle sidebar"
+        onClick={toggleSidebar}
+        title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      >
+        {sidebarCollapsed ? '→' : '←'}
       </button>
 
       <div className="navbar-header">
@@ -43,27 +57,48 @@ export default function Navbar({ user, onLogout }) {
 
   <ul className={`nav-menu ${menuOpen ? 'open' : ''}`}>
         <li className="nav-item">
-          <a className={`nav-link ${isActive('/')}`} onClick={() => handleNav('/')}>📊 Dashboard</a>
+          <a className={`nav-link ${isActive('/')}`} onClick={() => handleNav('/')}>
+            <span className="nav-icon">📊</span>
+            <span className="nav-label">Dashboard</span>
+          </a>
         </li>
         <li className="nav-item">
-          <a className={`nav-link ${isActive('/sessions')}`} onClick={() => handleNav('/sessions')}>📅 Sessions</a>
+          <a className={`nav-link ${isActive('/sessions')}`} onClick={() => handleNav('/sessions')}>
+            <span className="nav-icon">📅</span>
+            <span className="nav-label">Sessions</span>
+          </a>
         </li>
         <li className="nav-item">
-          <a className={`nav-link ${isActive('/players')}`} onClick={() => handleNav('/players')}>👥 Players</a>
+          <a className={`nav-link ${isActive('/players')}`} onClick={() => handleNav('/players')}>
+            <span className="nav-icon">👥</span>
+            <span className="nav-label">Players</span>
+          </a>
         </li>
         <li className="nav-item">
-          <a className={`nav-link ${isActive('/guests')}`} onClick={() => handleNav('/guests')}>👤 Guests</a>
+          <a className={`nav-link ${isActive('/guests')}`} onClick={() => handleNav('/guests')}>
+            <span className="nav-icon">👤</span>
+            <span className="nav-label">Guests</span>
+          </a>
         </li>
         <li className="nav-item">
-          <a className={`nav-link ${isActive('/finance')}`} onClick={() => handleNav('/finance')}>💰 Finance</a>
+          <a className={`nav-link ${isActive('/finance')}`} onClick={() => handleNav('/finance')}>
+            <span className="nav-icon">💰</span>
+            <span className="nav-label">Finance</span>
+          </a>
         </li>
         {user?.role === 'Admin' && (
           <li className="nav-item">
-            <a className={`nav-link ${isActive('/admin')}`} onClick={() => handleNav('/admin')}>⚙️ Admin Panel</a>
+            <a className={`nav-link ${isActive('/admin')}`} onClick={() => handleNav('/admin')}>
+              <span className="nav-icon">⚙️</span>
+              <span className="nav-label">Admin Panel</span>
+            </a>
           </li>
         )}
       </ul>
-  <button className="logout-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>🚪 Logout</button>
+  <button className="logout-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>
+    <span className="logout-icon">🚪</span>
+    <span className="logout-label">Logout</span>
+  </button>
     </nav>
   );
 }
