@@ -35,6 +35,7 @@ router.post('/', authenticateToken, authorizeRole('Admin'), async (req, res) => 
 // Get all sessions
 router.get('/', authenticateToken, async (req, res) => {
   try {
+    console.log('GET /sessions called by user:', req.user?.id);
     const connection = await pool.getConnection();
     
     const [sessions] = await connection.execute(
@@ -43,6 +44,9 @@ router.get('/', authenticateToken, async (req, res) => {
        LEFT JOIN users u ON s.created_by = u.id
        ORDER BY s.session_date DESC, s.session_time DESC`
     );
+    
+    console.log('Sessions fetched from DB:', sessions.length, 'records');
+    console.log('Sessions:', sessions);
 
     // Get attendance count for each session
     for (let session of sessions) {
