@@ -81,7 +81,7 @@ router.get('/expenses', authenticateToken, async (req, res) => {
     const connection = await pool.getConnection();
 
     const [expenses] = await connection.execute(
-      `SELECT e.id, e.description, e.amount, e.category, e.recorded_by, u.full_name, e.recorded_at
+      `SELECT e.id, e.description, e.amount, e.category, e.recorded_by, u.full_name, e.recorded_at, e.is_paid
        FROM expenses e
        LEFT JOIN users u ON e.recorded_by = u.id
        ORDER BY e.recorded_at DESC`
@@ -105,9 +105,9 @@ router.get('/summary', authenticateToken, async (req, res) => {
       'SELECT COALESCE(SUM(amount), 0) as total_donations FROM donations WHERE is_paid = TRUE'
     );
 
-    // Total expenses
+    // Total paid expenses
     const [expenseData] = await connection.execute(
-      'SELECT COALESCE(SUM(amount), 0) as total_expenses FROM expenses'
+      'SELECT COALESCE(SUM(amount), 0) as total_expenses FROM expenses WHERE is_paid = TRUE'
     );
 
     // Last 30 days paid donations
@@ -115,9 +115,9 @@ router.get('/summary', authenticateToken, async (req, res) => {
       'SELECT COALESCE(SUM(amount), 0) as total_30_days FROM donations WHERE is_paid = TRUE AND donated_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)'
     );
 
-    // Last 30 days expenses
+    // Last 30 days paid expenses
     const [last30Expenses] = await connection.execute(
-      'SELECT COALESCE(SUM(amount), 0) as total_30_days FROM expenses WHERE recorded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)'
+      'SELECT COALESCE(SUM(amount), 0) as total_30_days FROM expenses WHERE is_paid = TRUE AND recorded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)'
     );
 
     await connection.release();
@@ -298,6 +298,41 @@ router.post('/income/:id/toggle-paid', authenticateToken, authorizeRole('Admin')
     await connection.release();
 
     res.json({ message: 'Income record status toggled', is_paid: newPaidStatus });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to toggle paid status' });
+  }
+});
+
+// Toggle expense paid status (Admin only)
+router.post('/expenses/:id/toggle-paid', authenticateToken, authorizeRole('Admin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const connection = await pool.getConnection();
+
+    // Get current paid status
+    const [expense] = await connection.execute(
+      'SELECT is_paid FROM expenses WHERE id = ?',
+      [id]
+    );
+
+    if (expense.length === 0) {
+      await connection.release();
+      return res.status(404).json({ error: 'Expense record not found' });
+    }
+
+    const newPaidStatus = !expense[0].is_paid;
+
+    // Toggle the paid status
+    await connection.execute(
+      'UPDATE expenses SET is_paid = ? WHERE id = ?',
+      [newPaidStatus, id]
+    );
+
+    await connection.release();
+
+    res.json({ message: 'Expense record status toggled', is_paid: newPaidStatus });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to toggle paid status' });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api';
 import { formatVND } from '../utils/format';
+import { formatVND } from '../utils/format';
 
 export default function FinanceExpense({ user }) {
   const [expenses, setExpenses] = useState([]);
@@ -54,6 +55,20 @@ export default function FinanceExpense({ user }) {
     }
   };
 
+  const handleMarkAsPaid = async (expenseId, currentPaidStatus) => {
+    try {
+      const res = await apiClient.post(`/finance/expenses/${expenseId}/toggle-paid`);
+      
+      // Update local state immediately with the new paid status
+      setExpenses(expenses.map(expense =>
+        expense.id === expenseId ? { ...expense, is_paid: res.data.is_paid } : expense
+      ));
+    } catch (error) {
+      console.error('Failed to toggle payment status:', error);
+      alert('Failed to update payment status');
+    }
+  };
+
   if (loading) return <div className="loading">Loading Expense Records...</div>;
 
   return (
@@ -76,6 +91,8 @@ export default function FinanceExpense({ user }) {
               <th>Category</th>
               <th>Recorded By</th>
               <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -84,8 +101,51 @@ export default function FinanceExpense({ user }) {
                 <td>{expense.description}</td>
                 <td>{formatVND(expense.amount)}</td>
                 <td style={{ textTransform: 'capitalize' }}>{expense.category}</td>
-                <td>{expense.created_by || '-'}</td>
+                <td>{expense.full_name || '-'}</td>
                 <td>{new Date(expense.recorded_at).toLocaleDateString()}</td>
+                <td>
+                  <span style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    backgroundColor: expense.is_paid ? '#d4edda' : '#f8d7da',
+                    color: expense.is_paid ? '#155724' : '#721c24'
+                  }}>
+                    {expense.is_paid ? '✓ Paid' : '⏳ Pending'}
+                  </span>
+                </td>
+                <td>
+                  {canEdit && (
+                    <button
+                      onClick={() => handleMarkAsPaid(expense.id, expense.is_paid)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        backgroundColor: expense.is_paid ? '#27ae60' : '#e74c3c',
+                        color: 'white',
+                        transition: 'all 0.3s ease',
+                        transform: 'scale(1)',
+                        opacity: 1
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'scale(1.05)';
+                        e.target.style.opacity = '0.9';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.opacity = '1';
+                      }}
+                    >
+                      {expense.is_paid ? '✓ Paid' : '💰 Pay'}
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

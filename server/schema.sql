@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   category VARCHAR(100),
   recorded_by INT NOT NULL,
   recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_paid BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE RESTRICT
 );
 
