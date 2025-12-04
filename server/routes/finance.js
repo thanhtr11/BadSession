@@ -395,10 +395,55 @@ router.post('/settings', authenticateToken, authorizeRole('Admin'), async (req, 
 
     connection = await pool.getConnection();
 
+    // Update settings
     await connection.execute(
       'UPDATE finance_settings SET player_monthly_rate = ?, player_monthly_year = ?, player_monthly_month = ?, guest_daily_rate = ? WHERE id = 1',
       [player_monthly_rate || 0, player_monthly_year || null, player_monthly_month || null, guest_daily_rate || 0]
     );
+
+    // If player_monthly_rate, year, and month are provided, auto-create income records for all players
+    if (player_monthly_rate && player_monthly_year && player_monthly_month) {
+      console.log(`Auto-creating income records for all players for ${player_monthly_year}-${player_monthly_month} at rate ${player_monthly_rate}`);
+      
+      // Get all players (non-guest users)
+      const [players] = await connection.execute(
+        'SELECT id, full_name FROM users WHERE role = ? ORDER BY full_name ASC',
+        ['Player']
+      );
+
+      console.log(`Found ${players.length} players`);
+
+      // Check if income records already exist for this period
+      const [existingRecords] = await connection.execute(
+        `SELECT COUNT(*) as count FROM donations d
+         WHERE d.is_guest = FALSE 
+         AND YEAR(d.donated_at) = ? 
+         AND MONTH(d.donated_at) = ? 
+         AND d.amount = ?`,
+        [player_monthly_year, player_monthly_month, player_monthly_rate]
+      );
+
+      if (existingRecords[0].count === 0) {
+        // Create income record for each player for this month
+        for (const player of players) {
+          await connection.execute(
+            `INSERT INTO donations (contributor_id, contributor_name, is_guest, amount, notes, donated_at) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+              player.id,
+              null,
+              false,
+              player_monthly_rate,
+              `Monthly income for ${player_monthly_year}-${String(player_monthly_month).padStart(2, '0')}`,
+              new Date(`${player_monthly_year}-${String(player_monthly_month).padStart(2, '0')}-01`)
+            ]
+          );
+        }
+        console.log(`Created ${players.length} income records for the month`);
+      } else {
+        console.log('Income records already exist for this period');
+      }
+    }
 
     res.json({ message: 'Settings updated successfully' });
   } catch (error) {
