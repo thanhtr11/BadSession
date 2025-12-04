@@ -1,19 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Navbar({ user, onLogout }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = (path) => location.pathname === path ? 'active' : '';
+  const isActive = (path) => (location.pathname === path ? 'active' : '');
 
   const handleLogout = () => {
     onLogout();
     navigate('/login');
   };
 
+  const handleNav = (path) => {
+    navigate(path);
+    setMenuOpen(false);
+  };
+
   return (
     <nav className="navbar">
+      <button
+        className="hamburger"
+        aria-label="Toggle navigation"
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen(!menuOpen)}
+      >
+        ☰
+      </button>
+
       <div className="navbar-header">
         <div className="navbar-title">🏸 BadSession</div>
         <div className="navbar-subtitle">Team Management</div>
@@ -24,44 +39,30 @@ export default function Navbar({ user, onLogout }) {
         <div className="user-role">{user?.role}</div>
       </div>
 
-      <ul className="nav-menu">
+      <ul className={`nav-menu ${menuOpen ? 'open' : ''}`}>
         <li className="nav-item">
-          <a href="/" className={`nav-link ${isActive('/')}`} onClick={() => navigate('/')}>
-            📊 Dashboard
-          </a>
+          <a className={`nav-link ${isActive('/')}`} onClick={() => handleNav('/')}>📊 Dashboard</a>
         </li>
         <li className="nav-item">
-          <a href="/sessions" className={`nav-link ${isActive('/sessions')}`} onClick={() => navigate('/sessions')}>
-            📅 Sessions
-          </a>
+          <a className={`nav-link ${isActive('/sessions')}`} onClick={() => handleNav('/sessions')}>📅 Sessions</a>
         </li>
         <li className="nav-item">
-          <a href="/players" className={`nav-link ${isActive('/players')}`} onClick={() => navigate('/players')}>
-            👥 Players
-          </a>
+          <a className={`nav-link ${isActive('/players')}`} onClick={() => handleNav('/players')}>👥 Players</a>
         </li>
         <li className="nav-item">
-          <a href="/guests" className={`nav-link ${isActive('/guests')}`} onClick={() => navigate('/guests')}>
-            👤 Guests
-          </a>
+          <a className={`nav-link ${isActive('/guests')}`} onClick={() => handleNav('/guests')}>👤 Guests</a>
         </li>
         <li className="nav-item">
-          <a href="/finance" className={`nav-link ${isActive('/finance')}`} onClick={() => navigate('/finance')}>
-            💰 Finance
-          </a>
+          <a className={`nav-link ${isActive('/finance')}`} onClick={() => handleNav('/finance')}>💰 Finance</a>
         </li>
         {user?.role === 'Admin' && (
           <li className="nav-item">
-            <a href="/admin" className={`nav-link ${isActive('/admin')}`} onClick={() => navigate('/admin')}>
-              ⚙️ Admin Panel
-            </a>
+            <a className={`nav-link ${isActive('/admin')}`} onClick={() => handleNav('/admin')}>⚙️ Admin Panel</a>
           </li>
         )}
       </ul>
 
-      <button className="logout-btn" onClick={handleLogout}>
-        🚪 Logout
-      </button>
+      <button className="logout-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>🚪 Logout</button>
     </nav>
   );
 }
